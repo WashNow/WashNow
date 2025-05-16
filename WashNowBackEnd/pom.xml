@@ -155,11 +155,7 @@
         </dependency>
 
         <!-- Logback -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.13</version>
-        </dependency>
+        <!--Eleminado ver se corrige erro build-->
 
         <!-- Surefire Plugin (for unit tests) -->
         <dependency>
