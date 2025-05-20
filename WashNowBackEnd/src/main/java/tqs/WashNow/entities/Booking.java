@@ -1,12 +1,17 @@
 package tqs.WashNow.entities;
 
 import java.time.LocalDateTime;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Booking {
@@ -14,8 +19,13 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long carwashBayId;
-    private Long userId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "bay_id")
+    private CarwashBay carwashBay;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private Person user;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -23,14 +33,20 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
+    @OneToOne(
+        mappedBy = "booking", 
+        cascade = CascadeType.ALL, // In order to auto-delete WashSession if Booking is deleted
+        orphanRemoval = true
+    )
+    private WashSession washSession;
+
     // Construtores
     public Booking() {}
 
-    public Booking(Long id, Long carwashBayId, Long userId, LocalDateTime startTime, LocalDateTime endTime,
+    public Booking(CarwashBay carwashBay, Person user, LocalDateTime startTime, LocalDateTime endTime,
             BookingStatus bookingStatus) {
-        this.id = id;
-        this.carwashBayId = carwashBayId;
-        this.userId = userId;
+        this.carwashBay = carwashBay;
+        this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
         this.bookingStatus = bookingStatus;
@@ -45,20 +61,20 @@ public class Booking {
         this.id = id;
     }
 
-    public Long getCarwashBayId() {
-        return carwashBayId;
+    public CarwashBay getCarwashBay() {
+        return carwashBay;
     }
 
-    public void setCarwashBayId(Long carwashBayId) {
-        this.carwashBayId = carwashBayId;
+    public void setCarwashBay(CarwashBay carwashBay) {
+        this.carwashBay = carwashBay;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Person getuser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setuser(Person user) {
+        this.user = user;
     }
 
     public LocalDateTime getStartTime() {

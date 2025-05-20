@@ -1,9 +1,15 @@
 package tqs.WashNow.entities;
 
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class CarwashStation {
@@ -17,21 +23,24 @@ public class CarwashStation {
     private double latitude;
     private double longitude;
 
-    private Long ownerID;
-    private int pressureBar;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id")
+    private Person owner;
+
+    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+    private Set<CarwashBay> bays;
 
     // Construtores
     public CarwashStation() {}
 
-    public CarwashStation(Long id, String name, String address, double latitude, double longitude, Long ownerID,
-            int pressureBar) {
-        this.id = id;
+    public CarwashStation(String name, String address, double latitude, double longitude, Person owner,
+            Set<CarwashBay> bays) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.ownerID = ownerID;
-        this.pressureBar = pressureBar;
+        this.owner = owner;
+        this.bays = bays;
     }
 
     // Getters e Setters
@@ -75,19 +84,18 @@ public class CarwashStation {
         this.longitude = longitude;
     }
 
-    public Long getOwnerID() {
-        return ownerID;
+    public Person getowner() {
+        return owner;
     }
 
-    public void setOwnerID(Long ownerID) {
-        this.ownerID = ownerID;
+    public void setowner(Person owner) {
+        this.owner = owner;
     }
 
-    public int getPressureBar() {
-        return pressureBar;
+    public Set<CarwashBay> getBays() { 
+        return bays; 
     }
-
-    public void setPressureBar(int pressureBar) {
-        this.pressureBar = pressureBar;
+    public void setBays(Set<CarwashBay> bays) { 
+        this.bays = bays; 
     }
 }

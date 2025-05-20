@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Payment {
@@ -14,7 +16,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long washSessionId;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "session_id")
+    private WashSession washSession;
+
     private double amount;
 
     @Enumerated(EnumType.STRING)
@@ -25,9 +30,8 @@ public class Payment {
     // Construtores
     public Payment() {}
 
-    public Payment(Long id, Long washSessionId, double amount, PaymentStatus paymentStatus, LocalDateTime timestamp) {
-        this.id = id;
-        this.washSessionId = washSessionId;
+    public Payment(WashSession washSession, double amount, PaymentStatus paymentStatus, LocalDateTime timestamp) {
+        this.washSession = washSession;
         this.amount = amount;
         this.paymentStatus = paymentStatus;
         this.timestamp = timestamp;
@@ -42,12 +46,12 @@ public class Payment {
         this.id = id;
     }
 
-    public Long getWashSessionId() {
-        return washSessionId;
+    public WashSession getwashSession() {
+        return washSession;
     }
 
-    public void setWashSessionId(Long washSessionId) {
-        this.washSessionId = washSessionId;
+    public void setwashSession(WashSession washSession) {
+        this.washSession = washSession;
     }
 
     public double getAmount() {

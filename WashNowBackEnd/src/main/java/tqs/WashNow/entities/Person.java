@@ -1,11 +1,15 @@
 package tqs.WashNow.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Person {
@@ -21,15 +25,20 @@ public class Person {
 
     private double balance;
 
-    // Construtores
-    public Person() {}
+    @OneToMany(mappedBy = "user")
+    private Set<Booking> bookings;
 
-    public Person(Long id, String name, String email, Role role, double balance) {
-        this.id = id;
+    // Construtores
+    public Person() {
+        this.bookings = new HashSet<>();
+    }
+
+    public Person(String name, String email, Role role, double balance) {
         this.name = name;
         this.email = email;
         this.role = role;
         this.balance = balance;
+        this.bookings = new HashSet<>();
     }
 
     // Getters e setters
@@ -71,5 +80,12 @@ public class Person {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public Set<Booking> getBookings() { 
+        return bookings; 
+    }
+    public void setBookings(Set<Booking> bookings) { 
+        this.bookings = bookings; 
     }
 }

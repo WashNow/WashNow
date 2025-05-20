@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class WashSession {
@@ -15,7 +17,9 @@ public class WashSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long bookingId;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 
     @Enumerated(EnumType.STRING)
     private WashProgram washProgram;
@@ -28,10 +32,9 @@ public class WashSession {
     // Construtores
     public WashSession() {}
 
-    public WashSession(Long id, Long bookingId, WashProgram washProgram, LocalDateTime startedAt, LocalDateTime endedAt,
+    public WashSession(Booking booking, WashProgram washProgram, LocalDateTime startedAt, LocalDateTime endedAt,
             double totalCost) {
-        this.id = id;
-        this.bookingId = bookingId;
+        this.booking = booking;
         this.washProgram = washProgram;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
@@ -47,12 +50,12 @@ public class WashSession {
         this.id = id;
     }
 
-    public Long getBookingId() {
-        return bookingId;
+    public Booking getbooking() {
+        return booking;
     }
 
-    public void setBookingId(Long bookingId) {
-        this.bookingId = bookingId;
+    public void setbooking(Booking booking) {
+        this.booking = booking;
     }
 
     public WashProgram getWashProgram() {
