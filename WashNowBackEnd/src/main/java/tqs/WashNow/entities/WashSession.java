@@ -18,7 +18,7 @@ public class WashSession {
     private Long id;
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "booking_id")
+    @JoinColumn(name = "booking_id", unique = true)
     private Booking booking;
 
     @Enumerated(EnumType.STRING)

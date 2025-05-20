@@ -2,7 +2,6 @@ package tqs.WashNow.entities;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 
 @Entity
 public class Booking {
@@ -33,23 +31,24 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
-    @OneToOne(
-        mappedBy = "booking", 
-        cascade = CascadeType.ALL, // In order to auto-delete WashSession if Booking is deleted
-        orphanRemoval = true
-    )
-    private WashSession washSession;
+    // Uma vez que o utilizador marca uma sessão de lavagem e paga antes de usufruir da mesma,
+    // ele tem de conseguir escolher o programa de lavagem que quer usar aqui no booking.
+    // Enquanto isso talvez vamos manter o WashProgram dentro da WashSession, na mesma para permitir
+    // que o utilizador possa mudar de ideias e escolher outro programa de lavagem.
+    @Enumerated(EnumType.STRING)
+    private WashProgram washProgram;
 
     // Construtores
     public Booking() {}
 
     public Booking(CarwashBay carwashBay, Person user, LocalDateTime startTime, LocalDateTime endTime,
-            BookingStatus bookingStatus) {
+            BookingStatus bookingStatus, WashProgram washProgram) {
         this.carwashBay = carwashBay;
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
         this.bookingStatus = bookingStatus;
+        this.washProgram = washProgram;
     }
 
     // Getters e Setters
@@ -101,5 +100,10 @@ public class Booking {
         this.bookingStatus = bookingStatus;
     }
 
-
+    public WashProgram getwashProgram() {
+        return washProgram;
+    }
+    public void setwashProgram(WashProgram washProgram) {
+        this.washProgram = washProgram;
+    }
 }
