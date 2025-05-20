@@ -19,18 +19,18 @@ public class CarwashBay {
 
     private String identifiableName;
     private boolean isActive;
-    private double pricePerMinute;
+    private double pricePerMinute;  // não está a ser usado, ainda tenho dever com o prof se pode ficar só os preços no enum
     private int pressureBar;
 
     // Construtores
     public CarwashBay() {}
 
     public CarwashBay(CarwashStation carwashStation, String identifiableName, boolean isActive,
-            double pricePerMinute, int pressureBar) {
+            int pressureBar) {
         this.carwashStation = carwashStation;
         this.identifiableName = identifiableName;
         this.isActive = isActive;
-        this.pricePerMinute = pricePerMinute;
+        // this.pricePerMinute = pricePerMinute;
         this.pressureBar = pressureBar;
     }
 

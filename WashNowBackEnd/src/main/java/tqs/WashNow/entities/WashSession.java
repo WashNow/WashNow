@@ -50,11 +50,11 @@ public class WashSession {
         this.id = id;
     }
 
-    public Booking getbooking() {
+    public Booking getBooking() {
         return booking;
     }
 
-    public void setbooking(Booking booking) {
+    public void setBooking(Booking booking) {
         this.booking = booking;
     }
 

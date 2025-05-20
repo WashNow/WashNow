@@ -27,6 +27,7 @@ public class Booking {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private double deposit;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
@@ -42,11 +43,12 @@ public class Booking {
     public Booking() {}
 
     public Booking(CarwashBay carwashBay, Person user, LocalDateTime startTime, LocalDateTime endTime,
-            BookingStatus bookingStatus, WashProgram washProgram) {
+            double deposit, BookingStatus bookingStatus, WashProgram washProgram) {
         this.carwashBay = carwashBay;
         this.user = user;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.deposit = deposit;
         this.bookingStatus = bookingStatus;
         this.washProgram = washProgram;
     }
@@ -106,4 +108,7 @@ public class Booking {
     public void setwashProgram(WashProgram washProgram) {
         this.washProgram = washProgram;
     }
+
+    public double getDeposit() { return deposit; }
+    public void setDeposit(double deposit) { this.deposit = deposit; }
 }
