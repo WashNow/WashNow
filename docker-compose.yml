@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: washnow_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: washnow
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - washnow_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "washnow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    build:
+      context: ./WashNowBackEnd
+      dockerfile: Dockerfile
+    container_name: washnow_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - washnow_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  washnow_network:
+    driver: bridge
+
+volumes:
+  db_data:
