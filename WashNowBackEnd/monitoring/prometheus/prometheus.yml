@@ -1,0 +1,17 @@
+# Ficheiro para definir as configurações globais para o servidor do Prometheus
+global:
+  scrape_interval: 15s # frequência com que o Prometheus irá recolher métricas dos alvos
+  evaluation_interval: 15s # frequência com que o Prometheus irá avaliar as regras
+
+# Para Definir a lista de alvos que o Prometheus deve monitorizar
+scrape_configs:
+  - job_name: 'WashNow_backend'
+    
+    # Obrigatório definir o caminho desta forma uma vez que estamos a fazê-lo dentro do Spring Boot
+    # e assim o Prometheus consegue encontrar o endpoint de métricas
+    # Trata-se de um caminho gerado automaticamente pelo Spring Boot Actuator com o endpoint 
+    # /actuator/prometheus onde estão as métricas expostas pelo Spring Boot Actuator
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      # Host e porta onde o serviço backend está a correr, como definido no docker-compose
+      - targets: ['washnow-backend:8080']

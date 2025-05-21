@@ -1,0 +1,15 @@
+# Este ficheiro define a fonte de dados que o Grafana deve usar — neste caso, o Prometheus. 
+# Visto que o Grafana, por si só, não sabe onde ir buscar as métricas, por isso é necessário apontar-lhe o endereço do Prometheus. 
+# (por exemplo, http://prometheus:9090, que funciona dentro da rede do nosso Docker Compose). 
+# Além disso, este ficheiro define essa fonte como a padrão (isDefault: true), permitindo que todos os dashboards usem automaticamente 
+# o Prometheus como origem de dados sem necessidade de configuração manual. 
+# Sendo que não usarmos ficheiros dete tipo teriamos de aceder ao Grafana ir a Settings > Data Sources, adicionar o Prometheus e preencher todos os campos manualmente.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
