@@ -12,6 +12,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Run Tests
+        working-directory: ./WashNowBackEnd
         run: mvn test  # Gera relatórios JUnit em `target/surefire-reports/`
       - name: Import results to Xray
         uses: mikepenz/xray-action@v2
