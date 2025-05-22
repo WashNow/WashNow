@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
+import { useNavigate } from 'react-router-dom';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import styles from './CarWashMap.module.css';
@@ -10,18 +11,52 @@ const carWashLocations = [
     name: "Lava Rápido Aveiro",
     address: "Rua do Brasil, 3810-123 Aveiro",
     coords: [-8.64554, 40.6405],
-    availableSlots: 3,
   },
   {
     id: 2,
     name: "Auto Lavagem Central",
     address: "Av. Dr. Lourenço Peixinho, 3810-105 Aveiro",
     coords: [-8.653, 40.644],
-    availableSlots: 0,
   },
+  {
+    id: 3,
+    name: "Lavagem Express Glória",
+    address: "Rua Eng. Von Haff, 3800-167 Aveiro",
+    coords: [-8.6582, 40.6378],
+    horario: "08:00-19:00"
+  },
+  {
+    id: 4,
+    name: "Eco Wash Vera Cruz",
+    address: "Rua dos Combatentes da Grande Guerra, 3810-089 Aveiro",
+    coords: [-8.6473, 40.6335],
+    horario: "07:30-20:00"
+  },
+  {
+    id: 5,
+    name: "AquaClean São Bernardo",
+    address: "Rua do Norte, 3800-551 Aveiro",
+    coords: [-8.6421, 40.6489],
+    servicos: ["Lavagem interior", "Aspiração", "Lavagem exterior"]
+  },
+  {
+    id: 6,
+    name: "LavAuto Esgueira",
+    address: "Rua dos Bombeiros Voluntários, 3800-527 Aveiro",
+    coords: [-8.6357, 40.6422],
+    preco: "€8-15"
+  },
+  {
+    id: 7,
+    name: "Brilliant Wash Cacia",
+    address: "EN235, 3800-614 Cacia",
+    coords: [-8.6243, 40.6607],
+    horario: "24 horas"
+  }
 ];
-
 const CarWashMap = () => {
+  const navigate = useNavigate();
+
   const mapRef = useRef(null);
   const markersRef = useRef({});
   const mapInstance = useRef(null);
@@ -91,23 +126,20 @@ const CarWashMap = () => {
             >
               <h3>{loc.name}</h3>
               <p>{loc.address}</p>
-              <span
-                className={`${styles.availability} ${
-                  loc.availableSlots === 0 ? styles.unavailable : styles.available
-                }`}
-              >
-                {loc.availableSlots} lugar{loc.availableSlots !== 1 ? 'es' : ''}
-              </span>
-              <button
-                className={styles.reserveButton}
-                disabled={loc.availableSlots === 0}
-                onClick={(e) => {
-                  e.stopPropagation(); // evita trigger do handleSelect
-                  handleReserve(loc);
-                }}
-              >
-                Reservar
-              </button>
+              <div className={styles.buttonGroup}>
+
+                <button
+                  className={styles.reserveButton}
+                  disabled={loc.availableSlots === 0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/reservar', { state: { locationData: loc } });
+                  }}
+
+                >
+                  Reservar
+                </button>
+              </div>
             </div>
           ))}
         </div>

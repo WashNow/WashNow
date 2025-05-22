@@ -4,6 +4,8 @@ import Home from './Pages/Home';
 import Perfil from './Pages/Perfil';
 import Mapa from './Pages/Mapa'
 import Header from './Components/nav/Header';
+import Reservar from './Pages/Reservar';
+
 
 
 
@@ -13,6 +15,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="Perfil" element={<Perfil />} />
       <Route path="Mapa" element={<Mapa />} />
+      <Route path="Reservar" element={<Reservar />} />
     </Route>
   )
 )

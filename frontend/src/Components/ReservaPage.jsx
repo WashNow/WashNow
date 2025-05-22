@@ -1,0 +1,214 @@
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import styles from './ReservaPage.module.css';
+
+const ReservaPage = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { locationData } = location.state || {};
+    
+    const [selectedDate, setSelectedDate] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [errors, setErrors] = useState({});
+    const [showPayment, setShowPayment] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+    if (!locationData) return <div>Local não encontrado.</div>;
+
+    const generateTimeSlots = (startHour, endHour, intervalMinutes) => {
+        const slots = [];
+        const start = startHour * 60;
+        const end = endHour * 60;
+
+        for (let minutes = start; minutes <= end; minutes += intervalMinutes) {
+            const hours = String(Math.floor(minutes / 60)).padStart(2, '0');
+            const mins = String(minutes % 60).padStart(2, '0');
+            slots.push(`${hours}:${mins}`);
+        }
+        return slots;
+    };
+
+    const timeSlots = generateTimeSlots(8, 19, 20);
+
+    const validateForm = () => {
+        const newErrors = {};
+        
+        if (!selectedDate) newErrors.date = 'Por favor, selecione uma data';
+        if (!startTime) newErrors.startTime = 'Por favor, selecione a hora de início';
+        if (!endTime) newErrors.endTime = 'Por favor, selecione a hora de término';
+        if (startTime && endTime && startTime >= endTime) {
+            newErrors.timeRange = 'A hora de término deve ser posterior à hora de início';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = () => {
+        if (validateForm()) {
+            setShowPayment(true);
+        }
+    };
+
+    const handlePayment = () => {
+        if (!paymentMethod) {
+            alert('Por favor, selecione um método de pagamento');
+            return;
+        }
+        
+        setIsProcessing(true);
+        
+        setTimeout(() => {
+            setPaymentSuccess(true);
+            
+            setTimeout(() => {
+                navigate('/Mapa');
+            }, 1000);
+        }, 2000);
+    };
+
+    return (
+        <div className={styles.container}>
+            <h1>Reserva em {locationData.name}</h1>
+            <p><strong>Endereço:</strong> {locationData.address}</p>
+
+            <div className={styles.formSection}>
+                <label>
+                    Data:
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => {
+                            setSelectedDate(e.target.value);
+                            setShowPayment(false);
+                        }}
+                        className={`${styles.input} ${errors.date ? styles.error : ''}`}
+                        min={new Date().toISOString().split('T')[0]}
+                    />
+                    {errors.date && <span className={styles.errorMessage}>{errors.date}</span>}
+                </label>
+
+                <label>
+                    Hora de Início:
+                    <select
+                        value={startTime}
+                        onChange={(e) => {
+                            setStartTime(e.target.value);
+                            setShowPayment(false);
+                        }}
+                        className={`${styles.input} ${errors.startTime ? styles.error : ''}`}
+                    >
+                        <option value="">Selecionar...</option>
+                        {timeSlots.map(time => (
+                            <option key={`start-${time}`} value={time}>
+                                {time}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.startTime && <span className={styles.errorMessage}>{errors.startTime}</span>}
+                </label>
+
+                <label>
+                    Hora de Término:
+                    <select
+                        value={endTime}
+                        onChange={(e) => {
+                            setEndTime(e.target.value);
+                            setShowPayment(false);
+                        }}
+                        className={`${styles.input} ${errors.endTime || errors.timeRange ? styles.error : ''}`}
+                    >
+                        <option value="">Selecionar...</option>
+                        {timeSlots
+                            .filter(time => !startTime || time > startTime)
+                            .map(time => (
+                                <option key={`end-${time}`} value={time}>
+                                    {time}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {errors.endTime && <span className={styles.errorMessage}>{errors.endTime}</span>}
+                    {errors.timeRange && <span className={styles.errorMessage}>{errors.timeRange}</span>}
+                </label>
+
+                <button 
+                    className={styles.confirmButton} 
+                    onClick={handleSubmit}
+                >
+                    Continuar para Pagamento
+                </button>
+            </div>
+
+            {showPayment && (
+                <div className={styles.paymentCard}>
+                    <h3>Resumo da Reserva</h3>
+                    <p><strong>Local:</strong> {locationData.name}</p>
+                    <p><strong>Data:</strong> {selectedDate}</p>
+                    <p><strong>Horário:</strong> {startTime} - {endTime}</p>
+                    
+                    <div className={styles.paymentMethods}>
+                        <h4>Método de Pagamento</h4>
+                        <label className={styles.paymentOption}>
+                            <input
+                                type="radio"
+                                name="payment"
+                                value="Cartão de Crédito"
+                                onChange={() => setPaymentMethod('Cartão de Crédito')}
+                            />
+                            Cartão de Crédito
+                        </label>
+                        <label className={styles.paymentOption}>
+                            <input
+                                type="radio"
+                                name="payment"
+                                value="MB Way"
+                                onChange={() => setPaymentMethod('MB Way')}
+                            />
+                            MB Way
+                        </label>
+                        <label className={styles.paymentOption}>
+                            <input
+                                type="radio"
+                                name="payment"
+                                value="Dinheiro"
+                                onChange={() => setPaymentMethod('Dinheiro')}
+                            />
+                            Dinheiro
+                        </label>
+                    </div>
+
+                    <button 
+                        className={styles.payButton}
+                        onClick={handlePayment}
+                    >
+                        Confirmar Pagamento
+                    </button>
+                </div>
+            )}
+
+            {(isProcessing || paymentSuccess) && (
+                <div className={styles.paymentModal}>
+                    <div className={styles.modalContent}>
+                        {!paymentSuccess ? (
+                            <>
+                                <div className={styles.loadingSpinner}></div>
+                                <p>A processar pagamento...</p>
+                            </>
+                        ) : (
+                            <>
+                                <div className={styles.successCheckmark}>✓</div>
+                                <p>Pagamento aceite!</p>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ReservaPage;
