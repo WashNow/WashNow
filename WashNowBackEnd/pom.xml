@@ -179,6 +179,18 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Para permitir a recolha de métricas para a monitorização com Prometheus -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+		<!-- Fornece os endpoints de gestão para a monitorização de saúde do sistema e exposição de métricas -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
 	</dependencies>
 
     <repositories>

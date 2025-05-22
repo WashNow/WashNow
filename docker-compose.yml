@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:latest
-    container_name: washnow_db
+    container_name: washnow-db
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -23,7 +23,7 @@ services:
     build:
       context: ./WashNowBackEnd
       dockerfile: Dockerfile
-    container_name: washnow_backend
+    container_name: washnow-backend
     ports:
       - "8080:8080"
     depends_on:
@@ -36,6 +36,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  prometheus:
+    image: prom/prometheus:v3.2.0
+    container_name: prometheus
+    ports:  # se precisar ajustar é só colocar 9091:9090, porta externa muda e interna continua igual
+      - "9090:9090" # Porta padrão do Prometheus
+    volumes:
+      # temos de montar os volumes no path /etc/prometheus... padrão para que ele consiga encontrar os ficheiros
+      - ./WashNowBackEnd/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - washnow_network
+
+  grafana:
+    image: grafana/grafana:11.5.0
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=SenhaTeste123!
+    ports:  # se precisar ajustar é só colocar 3001:3000, porta externa porta externa muda e interna continua igual
+      - "3000:3000" # Porta padrão do Grafana
+    volumes:
+      # temos de montar os volumes no path /etc/grafana... padrão para que ele consiga encontrar os ficheiros
+      - ./WashNowBackEnd/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./WashNowBackEnd/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - washnow_network
+    depends_on:
+      - prometheus
 
 networks:
   washnow_network:
