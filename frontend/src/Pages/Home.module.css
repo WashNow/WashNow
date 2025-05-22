@@ -1,0 +1,66 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding: 2.5rem 5vw;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.heroContent {
+  max-width: 50rem;
+  flex: 1;
+}
+
+.heroContent h1 {
+  font-size: clamp(2rem, 5vw, 3rem); 
+  color: #1677ff;
+  margin-bottom: 1rem;
+}
+
+.heroContent p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.heroImage {
+  flex: 1;
+  max-width: 50rem;
+}
+
+.heroImage img {
+  width: 100%;
+  border-radius: 1rem;
+}
+
+.features {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.feature {
+  flex: 1 1 250px;
+  padding: 1rem;
+}
+
+.icon {
+  font-size: 2.5rem;
+  color: #1890ff;
+  margin-bottom: 0.75rem;
+}
