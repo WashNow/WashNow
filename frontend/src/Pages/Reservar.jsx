@@ -1,10 +1,11 @@
 import React from 'react';
 import ReservaPage from '../Components/ReservaPage';
-import backgroundImage from '../assets/Lavagem.webp';
+import Header from '../Components/nav/Header';
 
 const Reservar = () => {
     return (
         <div >
+            <Header/>
             <ReservaPage />
         </div>
     );

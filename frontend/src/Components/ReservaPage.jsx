@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ReservaPage.module.css';
 
 const ReservaPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { locationData } = location.state || {};
     
     const [selectedDate, setSelectedDate] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -16,7 +15,14 @@ const ReservaPage = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-    if (!locationData) return <div>Local não encontrado.</div>;
+
+    const { stationId, stationData } = location.state || {};
+    
+    const [stationInfo, setStationInfo] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+
 
     const generateTimeSlots = (startHour, endHour, intervalMinutes) => {
         const slots = [];
@@ -53,27 +59,105 @@ const ReservaPage = () => {
         }
     };
 
-    const handlePayment = () => {
-        if (!paymentMethod) {
-            alert('Por favor, selecione um método de pagamento');
-            return;
+    useEffect(() => {
+        const fetchStationData = async () => {
+            try {
+                if (stationData) {
+                    // Se já recebemos os dados completos, usa diretamente
+                    setStationInfo(stationData);
+                    setIsLoading(false);
+                } else if (stationId) {
+                    // Se só recebemos o ID, fazemos uma requisição para buscar os dados
+                    const response = await fetch(`/api/CarwashStations/${stationId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Estação não encontrada');
+                    }
+                    
+                    const data = await response.json();
+                    setStationInfo(data);
+                } else {
+                    throw new Error('Nenhuma estação especificada');
+                }
+            } catch (err) {
+                console.error('Erro ao buscar dados da estação:', err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStationData();
+    }, [stationId, stationData]);
+
+const handlePayment = async () => {
+    if (!paymentMethod) {
+        alert('Por favor, selecione um método de pagamento');
+        return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+        // Concatena a data com a hora para criar timestamps completos
+        const startISO = new Date(`${selectedDate}T${startTime}:00`).toISOString();
+        const endISO = new Date(`${selectedDate}T${endTime}:00`).toISOString();
+
+        const response = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                carwashBayId: stationInfo.id, // ou stationInfo.bayId, se for o caso
+                userId: 1,
+                startTime: startISO,
+                endTime: endISO,
+                bookingStatus: "RESERVED"
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao criar a reserva');
         }
-        
-        setIsProcessing(true);
-        
+
+        setPaymentSuccess(true);
+
         setTimeout(() => {
-            setPaymentSuccess(true);
-            
-            setTimeout(() => {
-                navigate('/Mapa');
-            }, 1000);
-        }, 2000);
-    };
+            navigate('/Mapa');
+        }, 1000);
+
+    } catch (error) {
+        console.error('Erro ao processar pagamento/reserva:', error);
+        alert('Ocorreu um erro ao processar a reserva. Tente novamente.');
+    } finally {
+        setIsProcessing(false);
+    }
+};
+
+
+    if (isLoading) {
+        return <div className={styles.container}>Carregando informações da estação...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className={styles.container}>
+                <p>Erro: {error}</p>
+                <button onClick={() => navigate(-1)}>Voltar</button>
+            </div>
+        );
+    }
+
+    if (!stationInfo) {
+        return <div className={styles.container}>Estação não encontrada.</div>;
+    }
+
 
     return (
         <div className={styles.container}>
-            <h1>Reserva em {locationData.name}</h1>
-            <p><strong>Endereço:</strong> {locationData.address}</p>
+<h1>Reserva em {stationInfo.name}</h1>
+<p><strong>Endereço:</strong> {stationInfo.address}</p>
 
             <div className={styles.formSection}>
                 <label>
@@ -146,7 +230,7 @@ const ReservaPage = () => {
             {showPayment && (
                 <div className={styles.paymentCard}>
                     <h3>Resumo da Reserva</h3>
-                    <p><strong>Local:</strong> {locationData.name}</p>
+                    <p><strong>Local:</strong> {stationInfo.name}</p>
                     <p><strong>Data:</strong> {selectedDate}</p>
                     <p><strong>Horário:</strong> {startTime} - {endTime}</p>
                     
