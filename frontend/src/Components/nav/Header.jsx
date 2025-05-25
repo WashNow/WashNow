@@ -1,8 +1,6 @@
-import { HomeTwoTone, EditTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import profilePic from '../../assets/profile.png';
-
 
 const Header = () => {
     const location = useLocation();
@@ -12,18 +10,15 @@ const Header = () => {
         navigate(path);
     };
 
+    const handleLogout = () => {
+        navigate('/');
+    };
+
     return (
         <>
             <header className={styles.header}>
                 <div className={styles.logo}>WashNow</div>
                 <nav className={styles.nav}>
-                    <div
-                        onClick={() => goTo('/')}
-                        className={`${styles.navItem} ${location.pathname === '/' ? styles.active : ''}`}
-                    >
-                        <HomeTwoTone />
-                        <span>Home</span>
-                    </div>
                     <div
                         onClick={() => goTo('/Mapa')}
                         className={`${styles.navItem} ${location.pathname === '/Mapa' ? styles.active : ''}`}
@@ -39,7 +34,12 @@ const Header = () => {
                         </div>
                         <span>Perfil</span>
                     </div>
-
+                    <div
+                        onClick={handleLogout}
+                        className={styles.navItemLogout}
+                    >
+                        <span>Logout</span>
+                    </div>
                 </nav>
             </header>
             <Outlet />

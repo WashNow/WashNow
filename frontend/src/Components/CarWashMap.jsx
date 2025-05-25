@@ -2,60 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import { useNavigate } from 'react-router-dom';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
 import styles from './CarWashMap.module.css';
 
-const carWashLocations = [
-  {
-    id: 1,
-    name: "Lava Rápido Aveiro",
-    address: "Rua do Brasil, 3810-123 Aveiro",
-    coords: [-8.64554, 40.6405],
-  },
-  {
-    id: 2,
-    name: "Auto Lavagem Central",
-    address: "Av. Dr. Lourenço Peixinho, 3810-105 Aveiro",
-    coords: [-8.653, 40.644],
-  },
-  {
-    id: 3,
-    name: "Lavagem Express Glória",
-    address: "Rua Eng. Von Haff, 3800-167 Aveiro",
-    coords: [-8.6582, 40.6378],
-    horario: "08:00-19:00"
-  },
-  {
-    id: 4,
-    name: "Eco Wash Vera Cruz",
-    address: "Rua dos Combatentes da Grande Guerra, 3810-089 Aveiro",
-    coords: [-8.6473, 40.6335],
-    horario: "07:30-20:00"
-  },
-  {
-    id: 5,
-    name: "AquaClean São Bernardo",
-    address: "Rua do Norte, 3800-551 Aveiro",
-    coords: [-8.6421, 40.6489],
-    servicos: ["Lavagem interior", "Aspiração", "Lavagem exterior"]
-  },
-  {
-    id: 6,
-    name: "LavAuto Esgueira",
-    address: "Rua dos Bombeiros Voluntários, 3800-527 Aveiro",
-    coords: [-8.6357, 40.6422],
-    preco: "€8-15"
-  },
-  {
-    id: 7,
-    name: "Brilliant Wash Cacia",
-    address: "EN235, 3800-614 Cacia",
-    coords: [-8.6243, 40.6607],
-    horario: "24 horas"
-  }
-];
 const CarWashMap = () => {
   const navigate = useNavigate();
+  const [carWashStations, setCarWashStations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const mapRef = useRef(null);
   const markersRef = useRef({});
@@ -63,38 +16,78 @@ const CarWashMap = () => {
   const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
+    const fetchCarWashStations = async () => {
+      try {
+        const response = await fetch('/api/CarwashStations', {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Erro ${response.status}: ${errorText}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          throw new Error(`Resposta não é JSON: ${text.substring(0, 100)}...`);
+        }
+
+        const data = await response.json();
+        setCarWashStations(data);
+      } catch (err) {
+        console.error('Erro ao buscar estações:', err);
+        setError(`Falha ao carregar estações: ${err.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCarWashStations();
+  }, []);
+
+  useEffect(() => {
+    if (carWashStations.length === 0) return;
+
     const map = new maplibregl.Map({
       container: mapRef.current,
       style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
-      center: [-8.64554, 40.6405],
+      center: [carWashStations[0].longitude, carWashStations[0].latitude],
       zoom: 13,
     });
 
     mapInstance.current = map;
 
-    carWashLocations.forEach(loc => {
+    carWashStations.forEach(station => {
+      // Converter para o formato [longitude, latitude] que o MapLibre espera
+      const coordinates = [station.longitude, station.latitude];
+      
       const popup = new maplibregl.Popup().setHTML(
-        `<strong>${loc.name}</strong><br/>${loc.address}<br/><em>Lugares disponíveis: ${loc.availableSlots}</em>`
+        `<strong>${station.name}</strong><br/>
+         ${station.address}<br/>
+         <em>Pressão: ${station.pressureBar} bar</em>`
       );
 
       const marker = new maplibregl.Marker({ color: '#1677ff' })
-        .setLngLat(loc.coords)
+        .setLngLat(coordinates)
         .setPopup(popup)
         .addTo(map);
 
-      markersRef.current[loc.id] = { marker, popup };
+      markersRef.current[station.id] = { marker, popup };
     });
 
     return () => map.remove();
-  }, []);
+  }, [carWashStations]);
 
-  const handleSelect = (location) => {
-    setSelectedId(location.id);
+  const handleSelect = (station) => {
+    setSelectedId(station.id);
     const map = mapInstance.current;
-    const { marker, popup } = markersRef.current[location.id];
+    const { marker, popup } = markersRef.current[station.id];
 
     map.flyTo({
-      center: location.coords,
+      center: [station.longitude, station.latitude],
       zoom: 15,
       speed: 1.2,
     });
@@ -102,47 +95,56 @@ const CarWashMap = () => {
     popup.addTo(map);
   };
 
-  const handleReserve = (location) => {
-    if (location.availableSlots === 0) {
-      alert('Este local está sem vagas disponíveis.');
-      return;
-    }
+  if (isLoading) {
+    return <div className={styles.container}>Carregando estações de lavagem...</div>;
+  }
 
-    // Aqui pode ir a lógica para reserva (API, modal, etc.)
-    console.log(`Reservar: ${location.name}`);
-    alert(`Reserva iniciada para ${location.name}`);
-  };
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <p>Erro ao carregar estações: {error}</p>
+        <button onClick={() => window.location.reload()}>Tentar novamente</button>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.list}>
-        <h2>Locais de Lavagem em Aveiro</h2>
-        <div>
-          {carWashLocations.map(loc => (
-            <div
-              key={loc.id}
-              className={`${styles.card} ${selectedId === loc.id ? styles.selected : ''}`}
-              onClick={() => handleSelect(loc)}
-            >
-              <h3>{loc.name}</h3>
-              <p>{loc.address}</p>
-              <div className={styles.buttonGroup}>
-
-                <button
-                  className={styles.reserveButton}
-                  disabled={loc.availableSlots === 0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/reservar', { state: { locationData: loc } });
-                  }}
-
-                >
-                  Reservar
-                </button>
+        <h2>Estações de Lavagem</h2>
+        {carWashStations.length === 0 ? (
+          <p>Nenhuma estação disponível no momento</p>
+        ) : (
+          <div>
+            {carWashStations.map(station => (
+              <div
+                key={station.id}
+                className={`${styles.card} ${selectedId === station.id ? styles.selected : ''}`}
+                onClick={() => handleSelect(station)}
+              >
+                <h3>{station.name}</h3>
+                <p>{station.address}</p>
+                <div className={styles.buttonGroup}>
+                 <button
+  className={styles.reserveButton}
+  onClick={(e) => {
+    e.stopPropagation();
+    navigate('/reservar', { 
+      state: { 
+        stationId: station.id,  // Passa apenas o ID
+        // Ou se preferir manter os dados completos:
+        stationData: station 
+      } 
+    });
+  }}
+>
+  Reservar
+</button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
       <div className={styles.map} ref={mapRef}></div>
     </div>
