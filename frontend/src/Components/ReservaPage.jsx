@@ -164,6 +164,7 @@ const handlePayment = async () => {
                     Data:
                     <input
                         type="date"
+                        name="date"
                         value={selectedDate}
                         onChange={(e) => {
                             setSelectedDate(e.target.value);
@@ -179,6 +180,7 @@ const handlePayment = async () => {
                     Hora de Início:
                     <select
                         value={startTime}
+                        name="startTime"
                         onChange={(e) => {
                             setStartTime(e.target.value);
                             setShowPayment(false);
@@ -199,6 +201,7 @@ const handlePayment = async () => {
                     Hora de Término:
                     <select
                         value={endTime}
+                        name="endTime"
                         onChange={(e) => {
                             setEndTime(e.target.value);
                             setShowPayment(false);

@@ -65,6 +65,23 @@ services:
     depends_on:
       - prometheus
 
+#  frontend:
+#    build:
+#      context: .
+#      dockerfile: frontend/Dockerfile
+#    container_name: washnow-frontend
+#    ports:
+#      - "8000:80"
+#    depends_on:
+#      - app
+#    networks:
+#      - washnow_network
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:80 || exit 1"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 3
+
 networks:
   washnow_network:
     driver: bridge

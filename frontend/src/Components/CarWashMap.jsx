@@ -125,21 +125,22 @@ const CarWashMap = () => {
                 <h3>{station.name}</h3>
                 <p>{station.address}</p>
                 <div className={styles.buttonGroup}>
-                 <button
-  className={styles.reserveButton}
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate('/reservar', { 
-      state: { 
-        stationId: station.id,  // Passa apenas o ID
-        // Ou se preferir manter os dados completos:
-        stationData: station 
-      } 
-    });
-  }}
->
-  Reservar
-</button>
+                  <button
+                    name="reservar"
+                    className={styles.reserveButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/reservar', { 
+                        state: { 
+                          stationId: station.id,  // Passa apenas o ID
+                          // Ou se preferir manter os dados completos:
+                          stationData: station 
+                        } 
+                      });
+                    }}
+                  >
+                    Reservar
+                  </button>
                 </div>
               </div>
             ))}
