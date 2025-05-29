@@ -1,0 +1,94 @@
+.container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Sidebar com as estações */
+.sidebar {
+  width: 30%;
+  padding: 2rem 1.5rem;
+  background-color: #f0f2f5;
+  overflow-y: auto;
+  border-right: 1px solid #e0e0e0;
+}
+
+.sidebar h2 {
+  margin: 1rem 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+/* Botão para adicionar estação */
+.addButton {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: #1677ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: #125dcc;
+}
+
+/* Cartão de estação */
+.stationCard {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.stationCard:hover {
+  transform: translateY(-2px);
+}
+
+.selected {
+  border: 2px solid #1677ff;
+  box-shadow: 0 0 8px rgba(22, 119, 255, 0.3);
+}
+
+/* Conteúdo principal com as reservas */
+.mainContent {
+  width: 70%;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+.mainContent h2 {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.reservationList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Cartão de reserva */
+.reservationCard {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.reservationCard p {
+  margin: 0.25rem 0;
+  color: #444;
+  font-size: 0.95rem;
+}

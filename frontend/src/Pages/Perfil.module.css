@@ -58,13 +58,6 @@
   padding: 1rem 0;
 }
 
-.status {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
 .done {
   background: #e6fffb;
   color: #13c2c2;
@@ -73,4 +66,27 @@
 .cancelled {
   background: #fff1f0;
   color: #ff4d4f;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.reserved {
+    background-color: #3498db; /* azul */
+}
+
+.inProgress {
+    background-color: #f39c12; /* laranja */
+}
+
+.completed {
+    background-color: #2ecc71; /* verde */
+}
+
+.canceled {
+    background-color: #e74c3c; /* vermelho */
 }

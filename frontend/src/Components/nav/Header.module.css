@@ -42,6 +42,8 @@
 .active {
   background-color: #e6f4ff;
   color: #1677ff;
+  border-bottom: 2px solid #007bff;
+  font-weight: bold;
 }
 
 
@@ -61,3 +63,21 @@
   object-fit: cover;
   border-radius: 50%;
 }
+
+
+.navItem:hover {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.navItemLogout {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  color: #333;
+  transition: color 0.2s ease;
+}
+
+.navItemLogout:hover {
+  color: #007bff; /* azul ao passar o mouse */
+}
+
