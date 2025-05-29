@@ -21,3 +21,7 @@ Thus, allowing drivers to easily locate available bays, reserve one or more time
 [SonarCloud Page](https://sonarcloud.io/project/overview?id=TKahk_WashNow)
 
 [Documentation Page - To do]()
+
+# Badges
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=WashNow_WashNow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=WashNow_WashNow)
