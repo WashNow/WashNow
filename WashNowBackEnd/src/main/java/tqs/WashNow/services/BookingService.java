@@ -1,12 +1,12 @@
 package tqs.WashNow.services;
 
 import org.springframework.stereotype.Service;
-
 import tqs.WashNow.repositories.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import tqs.WashNow.entities.Booking;
+import tqs.WashNow.entities.BookingStatus;
+import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 public class BookingService {
@@ -19,8 +19,19 @@ public class BookingService {
     }
 
     // POST
-    public Booking createBooking(Booking booking) {
-        return bookingRepository.save(booking);
+    public Booking createBooking(Long carwashBayId, Long userId, LocalDateTime startTime, LocalDateTime endTime) {
+        Booking booking = null; // = bookingRepository.findBooking(carwashBayId, startTime, endTime);
+
+        if (booking != null) {
+            if (booking.getBookingStatus() == BookingStatus.AVAILABLE) {
+                booking.setBookingStatus(BookingStatus.RESERVED);
+                booking.setUserId(userId);
+                return updateBookingById(booking.getId(), booking);
+            }
+            return null;
+        }
+
+        return bookingRepository.save(new Booking(carwashBayId, userId, startTime, endTime, BookingStatus.RESERVED));
     }
 
     // GET
@@ -46,6 +57,4 @@ public class BookingService {
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
-    
-    
 }

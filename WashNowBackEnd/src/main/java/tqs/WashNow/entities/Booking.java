@@ -26,9 +26,8 @@ public class Booking {
     // Construtores
     public Booking() {}
 
-    public Booking(Long id, Long carwashBayId, Long userId, LocalDateTime startTime, LocalDateTime endTime,
+    public Booking(Long carwashBayId, Long userId, LocalDateTime startTime, LocalDateTime endTime,
             BookingStatus bookingStatus) {
-        this.id = id;
         this.carwashBayId = carwashBayId;
         this.userId = userId;
         this.startTime = startTime;
