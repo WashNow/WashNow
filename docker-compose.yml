@@ -65,6 +65,15 @@ services:
     depends_on:
       - prometheus
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    networks: 
+      - washnow_network
+
 networks:
   washnow_network:
     driver: bridge
