@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests && ls -l /app/target
+RUN chmod +x mvnw && ./mvnw clean package && ls -l /app/target
 
 FROM openjdk:17
 
