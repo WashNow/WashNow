@@ -1,15 +1,9 @@
-FROM openjdk:17-jdk-slim as builder
+FROM maven:latest
 
-WORKDIR /app
+WORKDIR .
 
 COPY . .
 
-RUN chmod +x mvnw && ./mvnw clean package && ls -l /app/target
+RUN mvn install -DskipTests
 
-FROM openjdk:17
-
-COPY --from=builder /app/target/WashNowBackEnd-0.0.1-SNAPSHOT.jar /app/WashNowBackEnd.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app/WashNowBackEnd.jar"]
+CMD mvn spring-boot:run

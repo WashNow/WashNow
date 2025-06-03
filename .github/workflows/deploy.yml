@@ -1,0 +1,43 @@
+name: Deploy project
+
+on:
+  push:
+    branches:
+      - develop
+      - MBA-55-finish-cd-pipeline
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Verificar diretório atual e arquivos
+        run: |
+          pwd
+          ls -la
+          ls -la frontend
+
+      - name: Preparar arquivos de ambiente
+        run: |
+          cp .env .env
+          cp frontend/.env_deploy frontend/.env
+
+      - name: Configurar NGINX
+        run: |
+          sudo cp frontend/nginx.conf /etc/nginx/sites-available/default
+          sudo nginx -t
+          sudo systemctl reload nginx
+
+      - name: Limpar recursos Docker antigos
+        run: |
+          docker compose down --remove-orphans --volumes
+          docker system prune -af
+          docker volume prune -f
+
+      - name: Fazer build e subir com Docker Compose
+        run: docker compose -f compose.yml up -d --build --remove-orphans
+
+     
