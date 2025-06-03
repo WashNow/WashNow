@@ -1,0 +1,32 @@
+name: Deploy project
+
+on:
+  push:
+    branches:
+      - develop
+      - MBA-55-finish-cd-pipeline
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Prepare environment files
+        run: |
+          cp .env_example .env
+          cp frontend/.env_example_deploy frontend/.env
+
+      - name: Configure Nginx for deployment
+        run: cp frontend/.nginx_conf_deploy frontend/nginx.conf
+
+      - name: Clean up unused Docker resources (containers, images, networks, volumes)
+        run: |
+          docker-compose down --remove-orphans --volumes
+          docker system prune -af
+          docker volume prune -f
+
+      - name: Deploy with Docker Compose
+        run: docker-compose -f docker-compose.yml up -d --build --remove-orphans
+     
