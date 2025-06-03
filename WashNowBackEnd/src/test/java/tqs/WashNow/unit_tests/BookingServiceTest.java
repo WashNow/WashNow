@@ -43,7 +43,7 @@ public class BookingServiceTest {
 
     @Test
     void testCreateBooking() {
-        Booking created = bookingService.createBooking(carwashBayId, userId, startTime, endTime);
+        Booking created = bookingService.createBooking(booking);
         System.out.println("Created booking: " + created);
         assertNotNull(created);
         assertEquals(id, created.getId());
@@ -57,7 +57,7 @@ public class BookingServiceTest {
 
         when(bookingRepository.save(booking)).thenReturn(booking);
 
-        Booking created = bookingService.createBooking(carwashBayId, userId, startTime, endTime);
+        Booking created = bookingService.createBooking(booking);
         assertNotNull(created);
         assertEquals(booking.getId(), created.getId());
         verify(bookingRepository, times(2)).save(booking);

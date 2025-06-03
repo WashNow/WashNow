@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ReservaPage.module.css';
+import { Modal, Radio, Button } from 'antd';
 
 const ReservaPage = () => {
     const location = useLocation();
@@ -230,52 +231,56 @@ const handlePayment = async () => {
                 </button>
             </div>
 
-            {showPayment && (
-                <div className={styles.paymentCard}>
-                    <h3>Resumo da Reserva</h3>
-                    <p><strong>Local:</strong> {stationInfo.name}</p>
-                    <p><strong>Data:</strong> {selectedDate}</p>
-                    <p><strong>Horário:</strong> {startTime} - {endTime}</p>
+            <Modal
+                title="Resumo da Reserva"
+                open={showPayment}
+                onCancel={() => setShowPayment(false)}
+                footer={null}
+                centered
+            >
+                <h3>Resumo da Reserva</h3>
+                <p><strong>Local:</strong> {stationInfo.name}</p>
+                <p><strong>Data:</strong> {selectedDate}</p>
+                <p><strong>Horário:</strong> {startTime} - {endTime}</p>
                     
-                    <div className={styles.paymentMethods}>
-                        <h4>Método de Pagamento</h4>
-                        <label className={styles.paymentOption}>
-                            <input
-                                type="radio"
-                                name="payment"
-                                value="Cartão de Crédito"
-                                onChange={() => setPaymentMethod('Cartão de Crédito')}
-                            />
-                            Cartão de Crédito
-                        </label>
-                        <label className={styles.paymentOption}>
-                            <input
-                                type="radio"
-                                name="payment"
-                                value="MB Way"
-                                onChange={() => setPaymentMethod('MB Way')}
-                            />
-                            MB Way
-                        </label>
-                        <label className={styles.paymentOption}>
-                            <input
-                                type="radio"
-                                name="payment"
-                                value="Dinheiro"
-                                onChange={() => setPaymentMethod('Dinheiro')}
-                            />
-                            Dinheiro
-                        </label>
-                    </div>
-
-                    <button 
-                        className={styles.payButton}
-                        onClick={handlePayment}
-                    >
-                        Confirmar Pagamento
-                    </button>
+                <div className={styles.paymentMethods}>
+                    <h4>Método de Pagamento</h4>
+                    <label className={styles.paymentOption}>
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="Cartão de Crédito"
+                            onChange={() => setPaymentMethod('Cartão de Crédito')}
+                        />
+                        Cartão de Crédito
+                    </label>
+                    <label className={styles.paymentOption} id="mbway">
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="MB Way"
+                            onChange={() => setPaymentMethod('MB Way')}
+                        />
+                        MB Way
+                    </label>
+                    <label className={styles.paymentOption}>
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="Dinheiro"
+                            onChange={() => setPaymentMethod('Dinheiro')}
+                        />
+                        Dinheiro
+                    </label>
                 </div>
-            )}
+
+                <button 
+                    className={styles.payButton}
+                    onClick={handlePayment}
+                >
+                    Confirmar Pagamento
+                </button>
+            </Modal>
 
             {(isProcessing || paymentSuccess) && (
                 <div className={styles.paymentModal}>

@@ -11,8 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import tqs.WashNow.services.BookingService;
 import tqs.WashNow.entities.Booking;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -41,11 +37,9 @@ public class BookingController {
         @ApiResponse(responseCode = "201", description = "Booking created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
-    public ResponseEntity<Booking> createBooking(@RequestParam Long carwashBayId, @RequestParam Long userId, 
-                                        @RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime) {
-        Booking createdBooking = bookingService.createBooking(carwashBayId, userId, startTime, endTime);
-        return ResponseEntity.ok(createdBooking);
-        //return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
+    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking) {
+        Booking createdBooking = bookingService.createBooking(booking);
+        return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
     }
 
     @GetMapping
