@@ -69,10 +69,24 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
-      - "8081:80"
+    expose:
+      - "80"
     networks: 
       - washnow_network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx-reverse-proxy
+    volumes:
+      - ./frontend/.nginx_conf_deploy:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - app
+    networks:
+      - washnow_network
+
 
 networks:
   washnow_network:
