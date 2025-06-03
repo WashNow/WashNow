@@ -29,7 +29,8 @@ jobs:
 
       - name: Clean up unused Docker resources (containers, images, networks, volumes)
         run: |
-          docker compose down --volumes
+          docker-compose down --volumes
           docker system prune -af
           docker volume prune -f
+
      
