@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: self-hosted
     name: Test Runner Connection
     steps:
       - name: Print message
