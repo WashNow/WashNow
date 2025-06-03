@@ -1,5 +1,9 @@
-name: Xray Test Report
-on: [push]
+name: Continuous Integration
+on: 
+  push:
+    branches:
+      - main
+      - dev
 
 jobs:
   test-and-report:
