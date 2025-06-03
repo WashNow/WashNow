@@ -28,5 +28,5 @@ jobs:
           docker volume prune -f
 
       - name: Deploy with Docker Compose
-        run: docker compose --file compose.yml up -d --build --remove-orphans
+        run: docker-compose -f compose.yml up -d --build --remove-orphans
      
