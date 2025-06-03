@@ -20,20 +20,14 @@ jobs:
           pwd
           ls -la
           ls -la frontend
-
-      - name: Preparar arquivos de ambiente
+        
+      - name: Start NGINX
         run: |
-          cp .env .env
-          cp frontend/.env_deploy frontend/.env
-
-      - name: Limpar recursos Docker antigos
-        run: |
-          docker compose down --remove-orphans --volumes
-          docker system prune -af
-          docker volume prune -f
+          sudo systemctl start nginx
+          sudo systemctl reload nginx
 
       - name: Fazer build e subir com Docker Compose
-        run: docker compose -f docker-compose.yml up -d --build --remove-orphans
+        run: docker-compose -f docker-compose.yml up -d --build --remove-orphans
 
 
      
