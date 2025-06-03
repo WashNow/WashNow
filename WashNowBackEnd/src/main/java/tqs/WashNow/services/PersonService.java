@@ -19,10 +19,10 @@ public class PersonService {
     }
 
     // POST
-    public Person createPerson(Person Person) {
-        if (PersonRepository.existsById(Person.getId())) return null;
+    public Person createPerson(Person person) {
+        if (person.getId() != null && PersonRepository.existsById(person.getId())) return null;
 
-        return PersonRepository.save(Person);
+        return PersonRepository.save(person);
     }
 
     // GET

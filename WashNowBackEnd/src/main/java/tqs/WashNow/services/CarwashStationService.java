@@ -17,10 +17,10 @@ public class CarwashStationService {
     }
 
     // POST
-    public CarwashStation createCarwashStation(CarwashStation CarwashStation) {
-        if (CarwashStationRepository.existsById(CarwashStation.getId())) return null;
+    public CarwashStation createCarwashStation(CarwashStation carwashStation) {
+        if (carwashStation.getId() != null && CarwashStationRepository.existsById(carwashStation.getId())) return null;
         
-        return CarwashStationRepository.save(CarwashStation);
+        return CarwashStationRepository.save(carwashStation);
     }
 
     // GET

@@ -1,6 +1,8 @@
 package tqs.WashNow.functional;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -11,16 +13,89 @@ import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.time.Duration;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ReservationUITest {
 
     private WebDriver driver;
+    private static Process frontendProcess;
+
+    private static void waitForBackend(int timeoutSec) throws InterruptedException {
+        int attempts = 0, max = timeoutSec * 2;               // 2 tentativas/seg.
+        while (attempts < max) {
+            try (Socket s = new Socket("localhost", 8080)) {   // porta do Spring
+                return;                                       // backend pronto
+            } catch (IOException e) {
+                Thread.sleep(500);
+                attempts++;
+            }
+        }
+        throw new IllegalStateException("Backend não arrancou na 8080.");
+    }
+
+    // Iniciar o frontend
+    @BeforeAll
+    static void startFrontend() throws IOException, InterruptedException {
+        File frontendDir = new File("../frontend");
+
+        if (!new File(frontendDir, "package.json").exists()) {
+            throw new IllegalStateException(
+                "package.json não encontrado em " + frontendDir.getAbsolutePath()
+            );
+        }
+
+        ProcessBuilder pb = new ProcessBuilder()
+            .directory(frontendDir)
+            .command("npm", "run", "dev", "--", "--port", "5180");
+        pb.redirectErrorStream(true);
+        frontendProcess = pb.start();
+
+        //waitForBackend(60);
+
+        new Thread(() -> {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(frontendProcess.getInputStream()))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    System.out.println("[VITE] " + line);
+                }
+            } catch (IOException e) {
+                // Ignorar
+            }
+        }).start();
+
+        int attempts = 0;
+        while (attempts < 60) {
+            try (Socket s = new Socket("localhost", 5180)) {
+                return;
+            } catch (IOException e) {
+                Thread.sleep(500);
+                attempts++;
+            }
+        }
+        throw new IllegalStateException("Erro ao iniciar o frontend.");
+    }
+
+    // Parar o frontend
+    @AfterAll
+    static void stopFrontend() {
+        if (frontendProcess != null && frontendProcess.isAlive()) {
+            frontendProcess.destroy();
+            try {
+                frontendProcess.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {}
+            if (frontendProcess.isAlive()) {
+                frontendProcess.destroyForcibly();
+            }
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -35,7 +110,9 @@ public class ReservationUITest {
 
     @Test
     void testLoginAndReservation() throws InterruptedException {
-        driver.get("http://localhost:5173/");
+        driver.get("http://localhost:5180/");
+
+        Thread.sleep(2000); // Esperar o carregamento da página
 
         // Criar conta de dono 1 de estacao de lavagem
         WebElement createButton = driver.findElement(By.linkText("Criar conta"));
@@ -61,7 +138,7 @@ public class ReservationUITest {
 
         // Verificar redirecionamento
         Thread.sleep(500);
-        assertEquals("http://localhost:5173/", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/", driver.getCurrentUrl());
         
         // Criar conta de dono 2 de estacao de lavagem
         createButton = driver.findElement(By.linkText("Criar conta"));
@@ -87,7 +164,7 @@ public class ReservationUITest {
 
         // Verificar redirecionamento
         Thread.sleep(500);
-        assertEquals("http://localhost:5173/", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/", driver.getCurrentUrl());
         
         // Criar conta do cliente
         createButton = driver.findElement(By.linkText("Criar conta"));
@@ -105,7 +182,7 @@ public class ReservationUITest {
 
         // Verificar redirecionamento
         Thread.sleep(500);
-        assertEquals("http://localhost:5173/", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/", driver.getCurrentUrl());
 
         // Fazer login na conta do cliente
         WebElement emailInput = driver.findElement(By.name("email"));
@@ -115,7 +192,7 @@ public class ReservationUITest {
 
         // Verificar redirecionamento
         Thread.sleep(500);
-        assertEquals("http://localhost:5173/Mapa", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/Mapa", driver.getCurrentUrl());
 
         // Reservar uma lavagem
         WebElement reservarButton = driver.findElement(By.xpath("//button[text()='Reservar']"));
@@ -135,7 +212,7 @@ public class ReservationUITest {
         
         // Verificar redirecionamento
         Thread.sleep(2000);
-        assertEquals("http://localhost:5173/Mapa", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/Mapa", driver.getCurrentUrl());
 
         // Aceder o perfil do cliente
         WebElement profileLink = driver.findElement(By.xpath("//span[text()='Perfil']"));
@@ -143,7 +220,7 @@ public class ReservationUITest {
 
         // Verificar redirecionamento
         Thread.sleep(500);
-        assertEquals("http://localhost:5173/Perfil", driver.getCurrentUrl());
+        assertEquals("http://localhost:5180/Perfil", driver.getCurrentUrl());
 
         // Verificar se a reserva foi criada
         List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver1 -> {
