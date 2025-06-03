@@ -9,25 +9,24 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    timeout-minutes: 30
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Verificar diretório atual e arquivos
+      - name: Prepare environment files
         run: |
-          pwd
-          ls -la
-          ls -la frontend
-        
-      - name: Start NGINX
+          cp .env_example .env
+          cp frontend/.env_example_deploy frontend/.env
+
+      - name: Configure Nginx for deployment
+        run: cp frontend/.nginx_conf_deploy frontend/nginx.conf
+
+      - name: Clean up unused Docker resources (containers, images, networks, volumes)
         run: |
-          sudo systemctl start nginx
-          sudo systemctl reload nginx
+          docker compose down --remove-orphans --volumes
+          docker system prune -af
+          docker volume prune -f
 
-      - name: Fazer build e subir com Docker Compose
-        run: docker-compose -f docker-compose.yml up -d --build --remove-orphans
-
-
+      - name: Deploy with Docker Compose
+        run: docker compose -f compose.yml up -d --build --remove-orphans
      
