@@ -43,8 +43,8 @@ public class BookingServiceTest {
 
     @Test
     void testCreateBooking() {
+        when(bookingRepository.save(booking)).thenReturn(booking);
         Booking created = bookingService.createBooking(booking);
-        System.out.println("Created booking: " + created);
         assertNotNull(created);
         assertEquals(id, created.getId());
         verify(bookingRepository, times(1)).save(booking);
@@ -52,15 +52,13 @@ public class BookingServiceTest {
 
     @Test
     void testCreateBookingWhenExists() {
+        when(bookingRepository.existsById(1L)).thenReturn(true);
         bookingRepository.save(booking);
         assertTrue(bookingRepository.existsById(1L));
 
-        when(bookingRepository.save(booking)).thenReturn(booking);
-
         Booking created = bookingService.createBooking(booking);
-        assertNotNull(created);
-        assertEquals(booking.getId(), created.getId());
-        verify(bookingRepository, times(2)).save(booking);
+        assertNull(created);
+        verify(bookingRepository, times(1)).save(booking);
     }
 
     @Test
@@ -72,6 +70,14 @@ public class BookingServiceTest {
         assertEquals(booking.getId(), found.getId());
         verify(bookingRepository, times(1)).findById(1L);
     }
+
+    @Test
+    void testGetBookingByIdWhenNotExists() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
+        Booking found = bookingService.getBookingById(1L);
+        assertNull(found);
+        verify(bookingRepository).findById(1L);
+    }    
 
     @Test
     void testUpdateBookingByIdWhenExists() {
@@ -97,7 +103,6 @@ public class BookingServiceTest {
 
     @Test
     void testDeleteBookingById() {
-        doNothing().when(bookingRepository).deleteById(1L);
         bookingService.deleteBookingById(1L);
         verify(bookingRepository, times(1)).deleteById(1L);
     }
@@ -110,6 +115,7 @@ public class BookingServiceTest {
         List<Booking> result = bookingService.getAllBookings();
         assertNotNull(result);
         assertEquals(2, result.size());
+        assertTrue(result.contains(booking));
         verify(bookingRepository, times(1)).findAll();
     }
 }

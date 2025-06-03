@@ -20,6 +20,8 @@ public class PaymentService {
 
     // POST
     public Payment createPayment(Payment Payment) {
+        if (PaymentRepository.existsById(Payment.getId())) return null;
+
         return PaymentRepository.save(Payment);
     }
 

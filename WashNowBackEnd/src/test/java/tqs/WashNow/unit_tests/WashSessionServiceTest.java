@@ -2,20 +2,16 @@ package tqs.WashNow.unit_tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import tqs.WashNow.entities.WashProgram;
 import tqs.WashNow.entities.WashSession;
 import tqs.WashNow.repositories.WashSessionRepository;
@@ -25,18 +21,20 @@ import tqs.WashNow.services.WashSessionService;
 class WashSessionServiceTest {
 
     @Mock
-    private WashSessionRepository repository;
+    private WashSessionRepository washSessionRepository;
 
     @InjectMocks
-    private WashSessionService service;
+    private WashSessionService washSessionService;
 
     private WashSession session;
+
+    private Long id = 1L;
 
     @BeforeEach
     void setup() {
         // exemplo de sessão já existente
         session = new WashSession(
-            1L,
+            id,
             100L,
             WashProgram.PRE_WASH,
             LocalDateTime.of(2025, 5, 1, 9, 0),
@@ -46,138 +44,80 @@ class WashSessionServiceTest {
     }
 
     @Test
-    void whenCreate_thenSaveAndReturn() {
-        WashSession toCreate = new WashSession(
-            null,
-            200L,
-            WashProgram.FOAM_SOAP,
-            LocalDateTime.of(2025, 5, 2, 10, 0),
-            LocalDateTime.of(2025, 5, 2, 10, 20),
-            25.0
-        );
-        WashSession saved = new WashSession(
-            2L,
-            200L,
-            WashProgram.FOAM_SOAP,
-            toCreate.getStartedAt(),
-            toCreate.getEndedAt(),
-            25.0
-        );
+    void testCreateBooking() {
+        when(washSessionRepository.save(session)).thenReturn(session);
+        WashSession created = washSessionService.createWashSession(session);
+        assertNotNull(created);
+        assertEquals(id, created.getId());
+        verify(washSessionRepository, times(1)).save(session);
+    }
 
-        when(repository.save(toCreate)).thenReturn(saved);
+    @Test
+    void testCreateBookingWhenExists() {
+        when(washSessionRepository.existsById(1L)).thenReturn(true);
+        washSessionRepository.save(session);
+        assertTrue(washSessionRepository.existsById(1L));
 
-        WashSession result = service.createWashSession(toCreate);
+        WashSession created = washSessionService.createWashSession(session);
+        assertNull(created);
+        verify(washSessionRepository, times(1)).save(session);
+    }
 
+    @Test
+    void testGetBookingById() {
+        when(washSessionRepository.findById(1L)).thenReturn(Optional.of(session));
+
+        WashSession found = washSessionService.getWashSessionById(1L);
+        assertNotNull(found);
+        assertEquals(session.getId(), found.getId());
+        verify(washSessionRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testGetBookingByIdWhenNotExists() {
+        when(washSessionRepository.findById(1L)).thenReturn(Optional.empty());
+        WashSession found = washSessionService.getWashSessionById(1L);
+        assertNull(found);
+        verify(washSessionRepository).findById(1L);
+    }    
+
+    @Test
+    void testUpdateBookingByIdWhenExists() {
+        when(washSessionRepository.existsById(1L)).thenReturn(true);
+        when(washSessionRepository.save(session)).thenReturn(session);
+
+        WashSession updated = washSessionService.updateWashSessionById(1L, session);
+        assertNotNull(updated);
+        assertEquals(session.getId(), updated.getId());
+        verify(washSessionRepository, times(1)).existsById(1L);
+        verify(washSessionRepository, times(1)).save(session);
+    }
+
+    @Test
+    void testUpdateBookingByIdWhenNotExists() {
+        when(washSessionRepository.existsById(1L)).thenReturn(false);
+
+        WashSession updated = washSessionService.updateWashSessionById(1L, session);
+        assertNull(updated);
+        verify(washSessionRepository, times(1)).existsById(1L);
+        verify(washSessionRepository, never()).save(session);
+    }
+
+    @Test
+    void testDeleteBookingById() {
+        washSessionService.deleteWashSessionById(1L);
+        verify(washSessionRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void testGetAllBookings() {
+        List<WashSession> allBookings = Arrays.asList(session, new WashSession());
+        when(washSessionRepository.findAll()).thenReturn(allBookings);
+
+        List<WashSession> result = washSessionService.getAllWashSessions();
         assertNotNull(result);
-        assertEquals(2L, result.getId());
-        assertEquals(WashProgram.FOAM_SOAP, result.getWashProgram());
-        verify(repository, times(1)).save(toCreate);
-    }
-
-    @Test
-    void whenGetByIdExists_thenReturnSession() {
-        when(repository.findById(1L)).thenReturn(Optional.of(session));
-
-        WashSession result = service.getWashSessionById(1L);
-
-        assertNotNull(result);
-        assertEquals(100L, result.getBookingId());
-        assertEquals(15.0, result.getTotalCost());
-        verify(repository).findById(1L);
-    }
-
-    @Test
-    void whenGetByIdNotExists_thenReturnNull() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
-
-        WashSession result = service.getWashSessionById(99L);
-
-        assertNull(result);
-        verify(repository).findById(99L);
-    }
-
-    @Test
-    void whenUpdateExists_thenSetIdAndSave() {
-        Long id = 3L;
-        WashSession incoming = new WashSession(
-            null,
-            300L,
-            WashProgram.WAX,
-            LocalDateTime.of(2025, 6, 5, 14, 0),
-            LocalDateTime.of(2025, 6, 5, 14, 30),
-            45.0
-        );
-        WashSession updated = new WashSession(
-            id,
-            300L,
-            WashProgram.WAX,
-            incoming.getStartedAt(),
-            incoming.getEndedAt(),
-            45.0
-        );
-
-        when(repository.existsById(id)).thenReturn(true);
-        when(repository.save(any(WashSession.class))).thenReturn(updated);
-
-        WashSession result = service.updateWashSessionById(id, incoming);
-
-        assertNotNull(result);
-        assertEquals(id, result.getId());
-        assertEquals(WashProgram.WAX, result.getWashProgram());
-
-        ArgumentCaptor<WashSession> captor = ArgumentCaptor.forClass(WashSession.class);
-        verify(repository).save(captor.capture());
-        assertEquals(id, captor.getValue().getId());
-        assertEquals(300L, captor.getValue().getBookingId());
-    }
-
-    @Test
-    void whenUpdateNotExists_thenReturnNullAndDontSave() {
-        Long id = 50L;
-        WashSession incoming = new WashSession(
-            null,
-            400L,
-            WashProgram.HIGH_PRESSURE_RINSE,
-            LocalDateTime.now(),
-            LocalDateTime.now().plusMinutes(15),
-            30.0
-        );
-
-        when(repository.existsById(id)).thenReturn(false);
-
-        WashSession result = service.updateWashSessionById(id, incoming);
-
-        assertNull(result);
-        verify(repository, never()).save(any());
-    }
-
-    @Test
-    void whenDelete_thenRepositoryDeleteById() {
-        service.deleteWashSessionById(7L);
-        verify(repository, times(1)).deleteById(7L);
-    }
-
-    @Test
-    void whenGetAll_thenReturnList() {
-        WashSession s1 = new WashSession(
-            1L, 101L, WashProgram.SOAP,
-            LocalDateTime.now().minusHours(1),
-            LocalDateTime.now(), 20.0
-        );
-        WashSession s2 = new WashSession(
-            2L, 102L, WashProgram.WATER_ONLY,
-            LocalDateTime.now().minusHours(2),
-            LocalDateTime.now().minusHours(1), 10.0
-        );
-        List<WashSession> list = Arrays.asList(s1, s2);
-
-        when(repository.findAll()).thenReturn(list);
-
-        List<WashSession> result = service.getAllWashSessions();
-
         assertEquals(2, result.size());
-        assertTrue(result.contains(s1));
-        assertTrue(result.contains(s2));
-        verify(repository).findAll();
+        assertTrue(result.contains(session));
+        verify(washSessionRepository, times(1)).findAll();
     }
 }

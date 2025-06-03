@@ -19,6 +19,8 @@ public class CarwashBayService {
 
     // POST
     public CarwashBay createCarwashBay(CarwashBay CarwashBay) {
+        if (CarwashBayRepository.existsById(CarwashBay.getId())) return null;
+
         return CarwashBayRepository.save(CarwashBay);
     }
 

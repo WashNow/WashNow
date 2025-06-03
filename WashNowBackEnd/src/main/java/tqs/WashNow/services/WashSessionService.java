@@ -20,6 +20,8 @@ public class WashSessionService {
 
     // POST
     public WashSession createWashSession(WashSession WashSession) {
+        if (WashSessionRepository.existsById(WashSession.getId())) return null;
+
         return WashSessionRepository.save(WashSession);
     }
 

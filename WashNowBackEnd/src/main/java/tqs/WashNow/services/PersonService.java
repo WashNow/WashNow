@@ -20,6 +20,8 @@ public class PersonService {
 
     // POST
     public Person createPerson(Person Person) {
+        if (PersonRepository.existsById(Person.getId())) return null;
+
         return PersonRepository.save(Person);
     }
 

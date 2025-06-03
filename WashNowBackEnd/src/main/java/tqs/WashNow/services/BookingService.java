@@ -20,6 +20,8 @@ public class BookingService {
 
     // POST
     public Booking createBooking(Booking booking) {
+        if (bookingRepository.existsById(booking.getId())) return null;
+        
         return bookingRepository.save(booking);
     }
 

@@ -18,6 +18,8 @@ public class CarwashStationService {
 
     // POST
     public CarwashStation createCarwashStation(CarwashStation CarwashStation) {
+        if (CarwashStationRepository.existsById(CarwashStation.getId())) return null;
+        
         return CarwashStationRepository.save(CarwashStation);
     }
 
