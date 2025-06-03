@@ -70,7 +70,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5000:80"
+      - "80:80"
     networks: 
       - washnow_network
 

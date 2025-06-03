@@ -25,12 +25,6 @@ jobs:
           cp .env .env
           cp frontend/.env_deploy frontend/.env
 
-      - name: Configurar NGINX
-        run: |
-          sudo cp frontend/nginx.conf /etc/nginx/sites-available/default
-          sudo nginx -t
-          sudo systemctl reload nginx
-
       - name: Limpar recursos Docker antigos
         run: |
           docker compose down --remove-orphans --volumes
@@ -39,5 +33,6 @@ jobs:
 
       - name: Fazer build e subir com Docker Compose
         run: docker compose -f docker-compose.yml up -d --build --remove-orphans
+
 
      
