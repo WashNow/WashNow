@@ -69,8 +69,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    expose:
-      - "80"
+    ports:
+      - "8081:80" 
     networks: 
       - washnow_network
 
