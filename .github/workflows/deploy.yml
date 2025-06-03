@@ -27,6 +27,9 @@ jobs:
           docker system prune -af
           docker volume prune -f
 
-      - name: Deploy with Docker Compose
-        run: docker compose -f compose.yml up -d --build --remove-orphans
+      - name: Clean up unused Docker resources (containers, images, networks, volumes)
+        run: |
+          docker compose down --volumes
+          docker system prune -af
+          docker volume prune -f
      
