@@ -26,11 +26,10 @@
 		<tag/>
 		<url/>
 	</scm>
-	<properties>
-		<java.version>17</java.version>
-		<sonar.organization>wnw</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-	</properties>
+    <properties>
+        <sonar.organization>wnw</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    </properties>
 	<dependencies>
 		<!-- Spring Boot JPA -->
 		<dependency>
