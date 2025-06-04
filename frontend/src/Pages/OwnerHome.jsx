@@ -52,9 +52,11 @@ const OwnerHome = ({ ownerId }) => {
           return;
         }
 
-        const filtered = bookingsData.filter(
-          booking => booking.carwashBayId === selectedStationId
-        );
+        const filtered = bookingsData.filter(booking => {
+          const bay = bays.find(b => b.id === booking.carwashBayId);
+          return bay?.stationId === selectedStationId;
+        });
+
 
         const uniqueUserIds = [...new Set(filtered.map(b => b.userId))];
 

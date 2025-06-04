@@ -24,13 +24,22 @@ const LoginPage = () => {
       const foundUser = users.find(user => user.email.toLowerCase() === email.toLowerCase());
 
       if (foundUser) {
+        const userData = {
+          email: foundUser.email,
+          isAuthenticated: true,
+          userId: foundUser.id,
+          role: foundUser.role
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('User data saved:', userData); // Debug
+
         setErrorMessage('');
-        navigate('/Mapa');
+        navigate(foundUser.role === 'OWNER' ? '/OwnerHome' : '/Mapa');
       } else {
         setErrorMessage('Email não encontrado.');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
       setErrorMessage('Erro ao fazer login. Tente novamente.');
     }
   };
@@ -41,7 +50,6 @@ const LoginPage = () => {
       <div className={styles.container}>
         <form className={styles.form} onSubmit={handleLogin}>
           <h2>Login</h2>
-
           <input
             type="email"
             name="email"
@@ -54,9 +62,7 @@ const LoginPage = () => {
             }}
           />
           {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-
           <button type="submit" className={styles.button}>Entrar</button>
-
           <p className={styles.linkText}>
             Ainda não tem conta? <Link to="/signup" className={styles.link}>Criar conta</Link>
           </p>
