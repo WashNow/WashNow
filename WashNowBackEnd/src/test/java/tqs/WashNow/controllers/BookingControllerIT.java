@@ -83,7 +83,10 @@ class BookingControllerIT {
     @Test
     void testDeleteBooking() {
         Long id = 1L;
+        Booking booking = new Booking();
+        booking.setId(id);
         doNothing().when(bookingService).deleteBookingById(id);
+        when(bookingService.getBookingById(id)).thenReturn(booking);
 
         ResponseEntity<Void> response = bookingController.deleteBooking(id);
 
