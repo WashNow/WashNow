@@ -87,7 +87,27 @@ useEffect(() => {
                         <p className={styles.email}>{userInfo.email}</p>
                     </div>
                 ) : (
-                    <p>A carregar informações do utilizador...</p>
+
+                    <ul>
+                        {bookings.map(res => (
+                            <li key={res.id} className={styles.reserva} data-testid="reserva">
+                                <div>
+                                    <strong>{res.stationName}</strong>
+                                    <p>{new Date(res.startTime).toLocaleDateString()}</p>
+                                </div>
+                                <span
+                                    className={`${styles.status} ${res.bookingStatus === 'WASHING_COMPLETED' ? styles.completed :
+                                        res.bookingStatus === 'IN_PROGRESS' ? styles.inProgress :
+                                            res.bookingStatus === 'CANCELED' ? styles.canceled :
+                                                styles.reserved
+                                        }`}
+                                >
+                                    {statusMap[res.bookingStatus] || res.bookingStatus}
+                                </span>
+
+                            </li>
+                        ))}
+                    </ul>
                 )}
 
                 <div className={styles.history}>

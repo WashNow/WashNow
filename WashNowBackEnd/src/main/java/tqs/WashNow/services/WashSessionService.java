@@ -19,8 +19,10 @@ public class WashSessionService {
     }
 
     // POST
-    public WashSession createWashSession(WashSession WashSession) {
-        return WashSessionRepository.save(WashSession);
+    public WashSession createWashSession(WashSession washSession) {
+        if (washSession.getId() != null && WashSessionRepository.existsById(washSession.getId())) return null;
+
+        return WashSessionRepository.save(washSession);
     }
 
     // GET

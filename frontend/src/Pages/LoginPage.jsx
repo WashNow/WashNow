@@ -52,6 +52,7 @@ const LoginPage = () => {
           <h2>Login</h2>
           <input
             type="email"
+            name="email"
             placeholder="Email"
             className={styles.input}
             value={email}
