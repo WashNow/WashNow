@@ -14,7 +14,6 @@ const CarWashMap = () => {
   const popupsRef = useRef({});
   const mapInstance = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
-  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchCarWashStations = async () => {
