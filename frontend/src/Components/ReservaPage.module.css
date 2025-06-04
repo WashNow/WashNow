@@ -186,3 +186,50 @@ label {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+.confirmButton:hover {
+  background-color: #0056b3;
+}
+
+.laterButton {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.laterButton:hover {
+  background-color: #d6d6d6;
+}
+
+.confirmButton {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  width: 50%;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;  background-color: #007bff;
+  color: white;
+}
+
+.laterButton {
+  padding: 12px 20px;
+  font-size: 16px;
+  max-height: 50px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  width: 50%;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;  background-color: #dcdcdc;
+  color: #333;
+}
+
+.buttonGroup {
+  display:flexbox;
+  gap: 10px;
+  margin-top: 20px;
+}

@@ -14,6 +14,7 @@ const CarWashMap = () => {
   const markersRef = useRef({});
   const mapInstance = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchCarWashStations = async () => {
@@ -63,7 +64,7 @@ const CarWashMap = () => {
     carWashStations.forEach(station => {
       // Converter para o formato [longitude, latitude] que o MapLibre espera
       const coordinates = [station.longitude, station.latitude];
-      
+
       const popup = new maplibregl.Popup().setHTML(
         `<strong>${station.name}</strong><br/>
          ${station.address}<br/>
@@ -125,21 +126,23 @@ const CarWashMap = () => {
                 <h3>{station.name}</h3>
                 <p>{station.address}</p>
                 <div className={styles.buttonGroup}>
-                 <button
-  className={styles.reserveButton}
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate('/reservar', { 
-      state: { 
-        stationId: station.id,  // Passa apenas o ID
-        // Ou se preferir manter os dados completos:
-        stationData: station 
-      } 
-    });
-  }}
->
-  Reservar
-</button>
+                  <button
+                    className={styles.reserveButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user?.isAuthenticated) {
+                        navigate('/');
+                      } else {
+                        navigate('/reservar', {
+                          state: {
+                            stationData: station
+                          }
+                        });
+                      }
+                    }}
+                  >
+                    Reservar
+                  </button>
                 </div>
               </div>
             ))}
