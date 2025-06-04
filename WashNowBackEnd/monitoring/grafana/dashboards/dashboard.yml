@@ -1,0 +1,19 @@
+# Este ficheiro existe para automatizar a configuração inicial do Grafana, evitando a necessidade
+# de configurações manuais sempre que o serviço é iniciado, ao dizer ao Grafana 
+# onde procurar dashboards já criados por nós, em formato .json, e carregá-los automaticamente no arranque. 
+# Pelo que quisésemos fazer o mesmo mas sem este ficheiro teriamos de entrar manualmente na interface do Grafana, 
+# importar cada dashboard, dar-lhe um nome, escolher a pasta e definir a fonte de dados, enquanto que com este ficheiro, 
+# qualquer dashboard .json colocado na pasta especificada é automaticamente importado e aparece disponível assim que se acede ao Grafana.
+
+apiVersion: 1
+
+providers:
+  - name: 'washnow'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10 # comenta quando já não estiveres a fazer alterações nas dashboards e não precises de ver as alterações em tempo real
+    options:
+      path: /etc/grafana/provisioning/dashboards

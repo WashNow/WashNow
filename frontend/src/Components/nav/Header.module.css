@@ -1,0 +1,83 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 12px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.navItem:hover {
+  background-color: #f0f2f5;
+  color: #1890ff;
+}
+
+.active {
+  background-color: #e6f4ff;
+  color: #1677ff;
+  border-bottom: 2px solid #007bff;
+  font-weight: bold;
+}
+
+
+.avatarWrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
+.navItem:hover {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.navItemLogout {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  color: #333;
+  transition: color 0.2s ease;
+}
+
+.navItemLogout:hover {
+  color: #007bff; /* azul ao passar o mouse */
+}
+

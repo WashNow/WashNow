@@ -14,3 +14,14 @@ Thus, allowing drivers to easily locate available bays, reserve one or more time
 | André Vasques   | 113613 | Product Owner |
 | Rodrigo Jesus   | 113526 | QA Engineer |
 | José Pedro      | 113403 | DevOps Master |
+
+# Relevant Sources
+[JIRA Backlog Page](https://jpsopedro04.atlassian.net/jira/software/projects/MBA/boards/1?atlOrigin=eyJpIjoiZTJhNTYxNzg0MWZhNGExNDg1ZjNhZjM3ZjA0NzQ5ZDUiLCJwIjoiaiJ9)
+
+[SonarCloud Page](https://sonarcloud.io/project/overview?id=TKahk_WashNow)
+
+[Documentation Page - To do]()
+
+# Badges
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=WashNow_WashNow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=WashNow_WashNow)
