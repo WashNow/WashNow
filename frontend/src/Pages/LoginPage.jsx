@@ -44,6 +44,7 @@ const LoginPage = () => {
 
           <input
             type="email"
+            name="email"
             placeholder="Email"
             className={styles.input}
             value={email}

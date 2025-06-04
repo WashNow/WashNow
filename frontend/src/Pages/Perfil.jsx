@@ -87,7 +87,7 @@ const Perfil = () => {
                 ) : (
                     <ul>
                         {bookings.map(res => (
-                            <li key={res.id} className={styles.reserva}>
+                            <li key={res.id} className={styles.reserva} data-testid="reserva">
                                 <div>
                                     <strong>{res.stationName}</strong>
                                     <p>{new Date(res.startTime).toLocaleDateString()}</p>

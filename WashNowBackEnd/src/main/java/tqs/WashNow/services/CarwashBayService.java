@@ -1,7 +1,6 @@
 package tqs.WashNow.services;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tqs.WashNow.entities.CarwashBay;
@@ -18,8 +17,10 @@ public class CarwashBayService {
     }
 
     // POST
-    public CarwashBay createCarwashBay(CarwashBay CarwashBay) {
-        return CarwashBayRepository.save(CarwashBay);
+    public CarwashBay createCarwashBay(CarwashBay carwashBay) {
+        if (carwashBay.getId() != null && CarwashBayRepository.existsById(carwashBay.getId())) return null;
+
+        return CarwashBayRepository.save(carwashBay);
     }
 
     // GET

@@ -152,7 +152,7 @@ const SignupPage = () => {
             </div>
           )}
 
-          <button type="submit" className={styles.button}>Criar Conta</button>
+          <button type="submit" name="criarBtn" className={styles.button}>Criar Conta</button>
         </form>
       </div>
     </div>
