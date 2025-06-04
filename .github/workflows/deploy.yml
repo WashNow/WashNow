@@ -3,8 +3,8 @@ name: Deploy project
 on:
   push:
     branches:
-      - develop
-      - MBA-55-finish-cd-pipeline
+      - dev
+      - main
 
 jobs:
   deploy:
