@@ -20,7 +20,7 @@ Thus, allowing drivers to easily locate available bays, reserve one or more time
 
 [SonarCloud Page](https://sonarcloud.io/project/overview?id=TKahk_WashNow)
 
-[Documentation Page - To do]()
+[Documentation Page - To do](http://localhost:8080/swagger-ui/index.html)
 
 # Badges
 
