@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './AddStation.module.css';
 
 const AddStation = () => {
@@ -9,7 +9,6 @@ const AddStation = () => {
   const [longitude, setLongitude] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const user = JSON.parse(localStorage.getItem('user'));
   const ownerId = user?.userId;
