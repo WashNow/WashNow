@@ -219,20 +219,37 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
-
+                <version>0.8.10</version>
                 <executions>
-                    <!-- injeta o agente antes dos testes -->
                     <execution>
-                    <id>prepare-agent</id>
-                    <goals><goal>prepare-agent</goal></goals>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
                     </execution>
-
-                    <!-- gera jacoco.xml logo na phase verify -->
                     <execution>
-                    <id>report</id>
-                    <phase>verify</phase>   <!-- ou test -->
-                    <goals><goal>report</goal></goals>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>CLASS</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
