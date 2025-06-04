@@ -1,18 +1,29 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import profilePic from '../../assets/profile.png';
+import { useEffect } from 'react';
 
 const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const goTo = (path) => {
         navigate(path);
     };
 
     const handleLogout = () => {
+        localStorage.removeItem('user');
         navigate('/');
     };
+
+    useEffect(() => {
+        if (!user?.isAuthenticated && location.pathname !== '/') {
+            navigate('/');
+        }
+    }, [location.pathname, navigate, user]);
+
+    if (!user?.isAuthenticated) return null;
 
     return (
         <>
@@ -34,6 +45,14 @@ const Header = () => {
                         </div>
                         <span>Perfil</span>
                     </div>
+                    {user?.isOwner && (
+                        <div
+                            onClick={() => goTo('/OwnerHome')}
+                            className={`${styles.navItem} ${location.pathname === '/OwnerHome' ? styles.active : ''}`}
+                        >
+                            <span>Painel Dono</span>
+                        </div>
+                    )}
                     <div
                         onClick={handleLogout}
                         className={styles.navItemLogout}
