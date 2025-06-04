@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+      - hotfix/SonarCloud
+      - dev
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -33,6 +35,4 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          cd WashNowBackEnd
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=WashNow_WashNow
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=WashNow_WashNow
