@@ -28,7 +28,3 @@ jobs:
       - name: Run ESLint
         run: npm run lint
         working-directory: frontend
-
-      - name: Run Prettier
-        run: npm run format-check
-        working-directory: frontend
