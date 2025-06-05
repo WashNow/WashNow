@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ReservationUITestRemote {
+class ReservationUITestRemote {
 
     private WebDriver driver;
     private WebDriverWait wait;
@@ -142,9 +142,12 @@ public class ReservationUITestRemote {
         // Eseperar as reservas carregarem
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[text()='Reservar']")));
 
+        Thread.sleep(3000); // Espera para garantir que as reservas estão visíveis
+
         // Reservar uma lavagem
         WebElement reservarButton = driver.findElement(By.xpath("//button[text()='Reservar']"));
         reservarButton.click();
+        Thread.sleep(3000);
         WebElement dateInput = driver.findElement(By.name("date"));
         dateInput.sendKeys("04-01-2025");
         WebElement startTimeSelect = driver.findElement(By.name("startTime"));
@@ -153,6 +156,7 @@ public class ReservationUITestRemote {
         endTimeSelect.sendKeys("10:20");
         WebElement submitReservationButton = driver.findElement(By.xpath("//button[text()='Continuar para Pagamento']"));
         submitReservationButton.click();
+        Thread.sleep(2000);
         WebElement mbWayInput = driver.findElement(By.id("mbway"));
         mbWayInput.click();
         WebElement confirmButton = driver.findElement(By.xpath("//button[text()='Confirmar Pagamento']"));
@@ -174,15 +178,17 @@ public class ReservationUITestRemote {
         // Verificar redirecionamento
         wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/Perfil"));
 
+        Thread.sleep(3000);
+
         // Verificar se a reserva foi criada
         List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver1 -> {
             List<WebElement> elems =
                 driver1.findElements(By.cssSelector("li[data-testid='reserva']"));
             return elems.size() > 0 ? elems : null;
         });
-        String textoReserva = reservas.get(0).getText();
-        String dataReserva = reservas.get(0).findElement(By.tagName("p")).getText();
+        String textoReserva = reservas.get(reservas.size() - 1).getText();
+        String dataReserva = reservas.get(reservas.size() - 1).findElement(By.tagName("p")).getText();
         assertTrue(textoReserva.contains("e1"), "Reserva com estação não encontrada, real: " + textoReserva);
-        assertTrue(dataReserva.contains("4/1/2025"), "Reserva com data não encontrada, real: " + dataReserva);
+        assertTrue(dataReserva.contains("04/01/2025"), "Reserva com data não encontrada, real: " + dataReserva);
     }
 }

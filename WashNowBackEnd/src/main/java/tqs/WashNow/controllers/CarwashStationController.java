@@ -20,6 +20,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * REST Controller class for managing CarwashStation resources.
+ * Provides endpoints for creating, retrieving, updating, and deleting CarwashStations.
+ * 
+ * Endpoints:
+ * - POST /api/CarwashStations: Create a new CarwashStation.
+ * - GET /api/CarwashStations: Retrieve all CarwashStations.
+ * - GET /api/CarwashStations/{id}: Retrieve a CarwashStation by its ID.
+ * - PUT /api/CarwashStations/{id}: Update a CarwashStation by its ID.
+ * - DELETE /api/CarwashStations/{id}: Delete a CarwashStation by its ID.
+ * 
+ * Dependencies:
+ * - CarwashStationService: Service layer for handling business logic related to CarwashStations.
+ * 
+ * HTTP Status Codes:
+ * - 201: CarWashStation created successfully.
+ * - 200: Request processed successfully (ex: retrieving CarWashStations).
+ * - 204: CarWashStation deleted successfully.
+ * - 400: Invalid request data.
+ * - 404: CarWashStation not found.
+ * - 500: Internal server error.
+ * 
+ * @see CarwashStationService
+ * @see CarwashStation
+ */
 @RestController
 @RequestMapping("/api/CarwashStations")
 @Tag(name = "CarwashStation", description = "CarwashStation API")

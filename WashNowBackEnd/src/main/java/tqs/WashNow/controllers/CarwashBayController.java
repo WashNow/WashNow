@@ -20,6 +20,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * REST controller which provides endpoints responsible for managing car wash bay operations.
+ * This controller allows clients to create, retrieve, update, and delete car wash bay information.
+ *
+ * Endpoints:
+ * - POST /api/CarwashBays: Create a new CarwashBay.
+ * - GET /api/CarwashBays: Retrieve all CarwashBays.
+ * - GET /api/CarwashBays/{id}: Retrieve a specific CarwashBay by its ID.
+ * - PUT /api/CarwashBays/{id}: Update a specific CarwashBay by its ID.
+ * - DELETE /api/CarwashBays/{id}: Delete a specific CarwashBay by its ID.
+ * 
+ * Response Codes:
+ * - 201: CarwashBay created successfully.
+ * - 200: Request processed successfully (for example retrieving or updating CarwashBays).
+ * - 204: CarwashBay deleted successfully.
+ * - 400: Invalid request data.
+ * - 404: CarwashBay not found.
+ * - 500: Internal server error.
+ * 
+ * Dependencies:
+ * - CarwashBayService: Service layer for handling CarwashBay business logic.
+ * 
+ * @see CarwashBayService
+ * @see CarwashBay
+ */
 @RestController
 @RequestMapping("/api/CarwashBays")
 @Tag(name = "CarwashBay", description = "CarwashBay API")

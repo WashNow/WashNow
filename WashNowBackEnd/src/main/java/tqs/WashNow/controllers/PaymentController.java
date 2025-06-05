@@ -20,6 +20,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * REST controller that provides endpoints for managing payments.
+ * It includes operations for creating, retrieving, updating, and deleting payments.
+ * 
+ * Endpoints:
+ * - POST /api/Payments: Create a new payment.
+ * - GET /api/Payments: Retrieve all payments.
+ * - GET /api/Payments/{id}: Retrieve a payment by its ID.
+ * - PUT /api/Payments/{id}: Update a payment by its ID.
+ * - DELETE /api/Payments/{id}: Delete a payment by its ID.
+ * 
+ * Dependencies:
+ * - PaymentService: A service layer dependency for handling payment-related operations.
+ * 
+ * HTTP Status Codes:
+ * - 201: Payment created successfully.
+ * - 200: Request processed successfully (ex: retrieving payments).
+ * - 204: Payment deleted successfully.
+ * - 400: Invalid request data.
+ * - 404: Payment not found.
+ * - 500: Internal server error.
+ * 
+ * @see PaymentService
+ * @see Payment
+ */
 @RestController
 @RequestMapping("/api/Payments")
 @Tag(name = "Payment", description = "Payment API")

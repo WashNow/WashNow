@@ -20,6 +20,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * REST controller that provides endpoints for managing booking operations for our application.
+ * It includes operations for creating, retrieving, updating, and deleting bookings.
+ * 
+ * Endpoints:
+ * - POST /api/bookings: Create a new booking.
+ * - GET /api/bookings: Retrieve all bookings.
+ * - GET /api/bookings/{id}: Retrieve a specific booking by its ID.
+ * - PUT /api/bookings/{id}: Update a specific booking by its ID.
+ * - DELETE /api/bookings/{id}: Delete a specific booking by its ID.
+ * 
+ * Dependencies:
+ * - BookingService: A service layer dependency for handling booking-related business logic.
+ * 
+ * Response Codes:
+ * - 201: Booking created successfully.
+ * - 200: Request processed successfully (for example retrieving or updating bookings).
+ * - 204: Booking deleted successfully.
+ * - 400: Invalid request data.
+ * - 404: Booking not found.
+ * - 500: Internal server error.
+ * 
+ * @see BookingService
+ * @see Booking
+ */
 @RestController
 @RequestMapping("/api/bookings")
 @Tag(name = "Booking", description = "Booking API")
