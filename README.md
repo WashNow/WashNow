@@ -18,9 +18,9 @@ Thus, allowing drivers to easily locate available bays, reserve one or more time
 # Relevant Sources
 [JIRA Backlog Page](https://jpsopedro04.atlassian.net/jira/software/projects/MBA/boards/1?atlOrigin=eyJpIjoiZTJhNTYxNzg0MWZhNGExNDg1ZjNhZjM3ZjA0NzQ5ZDUiLCJwIjoiaiJ9)
 
-[SonarCloud Page](https://sonarcloud.io/project/overview?id=TKahk_WashNow)
+[SonarCloud Page](https://sonarcloud.io/summary/new_code?id=WashNow_WashNow)
 
-[Documentation Page - To do](http://localhost:8080/swagger-ui/index.html)
+[Documentation Page](http://localhost:8080/swagger-ui/index.html)
 
 # Badges
 
