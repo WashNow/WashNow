@@ -20,7 +20,7 @@ let washSessionTrend = new Trend('wash_session_created');
 let stationTrend = new Trend('stations_created');
 let paymentTrend = new Trend('payments_successful');
 
-const BASE = 'http://deti-tqs-11.ua.pt:8080';
+const BASE = 'http://deti-tqs-11.ua.pt:8080'; // MUDAR AQUI O URL QUANDO QUERES EXECUTAR LOCALMENTE OU NA VM
 
 export default function () {
   // 0. Scrape Prometheus endpoint
