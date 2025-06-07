@@ -53,7 +53,7 @@ const CarWashMap = () => {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
+      style: `https://tiles.stadiamaps.com/styles/alidade_smooth.json?api_key=${import.meta.env.VITE_STADIA_API_KEY}`,
       center: [carWashStations[0].longitude, carWashStations[0].latitude],
       zoom: 13,
     });
@@ -130,12 +130,12 @@ const CarWashMap = () => {
                     className={styles.reserveButton}
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate('/reservar', { 
-                        state: { 
+                      navigate('/reservar', {
+                        state: {
                           stationId: station.id,  // Passa apenas o ID
                           // Ou se preferir manter os dados completos:
-                          stationData: station 
-                        } 
+                          stationData: station
+                        }
                       });
                     }}
                   >
