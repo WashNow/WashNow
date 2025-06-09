@@ -14,6 +14,7 @@ const ReservaPage = () => {
     const [selectedDate, setSelectedDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
     const [errors, setErrors] = useState({});
     const [showPayment, setShowPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -57,16 +58,16 @@ const ReservaPage = () => {
     }, [selectedStationId]);
 
     const criarReserva = async () => {
-        if (!selectedDate || !startTime || !endTime) {
-            console.error('Data ou horário inválido:', { selectedDate, startTime, endTime });
-            alert('Por favor, preencha todos os campos de data e horário.');
+        if (!selectedDate || !startTime || !endTime || !paymentMethod) {
+            console.error('Campos inválidos:', { selectedDate, startTime, endTime, paymentMethod });
+            alert('Por favor, preencha todos os campos de data, horário e método de pagamento.');
             return;
         }
-    
+
         try {
             const startISO = new Date(`${selectedDate}T${startTime}:00`).toISOString();
             const endISO = new Date(`${selectedDate}T${endTime}:00`).toISOString();
-    
+
             const response = await fetch('/api/bookings', {
                 method: 'POST',
                 headers: {
@@ -77,10 +78,11 @@ const ReservaPage = () => {
                     userId: user?.userId,
                     startTime: startISO,
                     endTime: endISO,
-                    bookingStatus: "RESERVED"
+                    bookingStatus: "RESERVED",
+                    paymentMethod: paymentMethod, // Inclui o método de pagamento
                 }),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Erro ao criar a reserva');
             }
@@ -101,6 +103,7 @@ const ReservaPage = () => {
         if (startTime && endTime && startTime >= endTime) {
             newErrors.timeRange = 'A hora de término deve ser posterior à hora de início';
         }
+        if (!paymentMethod) newErrors.paymentMethod = 'Por favor, selecione um método de pagamento';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -113,10 +116,7 @@ const ReservaPage = () => {
     };
 
     const handlePayment = async () => {
-        if (!paymentMethod) {
-            alert('Por favor, selecione um método de pagamento');
-            return;
-        }
+        if (!validateForm()) return;
 
         setIsProcessing(true);
 
@@ -149,8 +149,8 @@ const ReservaPage = () => {
 
     const timeSlots = [];
     for (let h = 8; h < 20; h++) {
-    timeSlots.push(`${String(h).padStart(2, '0')}:00`);
-    timeSlots.push(`${String(h).padStart(2, '0')}:30`);
+        timeSlots.push(`${String(h).padStart(2, '0')}:00`);
+        timeSlots.push(`${String(h).padStart(2, '0')}:30`);
     }
 
     return (
@@ -219,7 +219,6 @@ const ReservaPage = () => {
                     {errors.startTime && <span className={styles.errorMessage}>{errors.startTime}</span>}
                 </label>
 
-
                 <label>
                     Hora de Término:
                     <select
@@ -238,6 +237,20 @@ const ReservaPage = () => {
                     {errors.timeRange && <span className={styles.errorMessage}>{errors.timeRange}</span>}
                 </label>
 
+                <label>
+                    Método de Pagamento:
+                    <select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className={`${styles.input} ${errors.paymentMethod ? styles.error : ''}`}
+                    >
+                        <option value="">Selecionar...</option>
+                        <option value="CREDIT_CARD">Cartão de Crédito</option>
+                        <option value="PAYPAL">PayPal</option>
+                        <option value="MBWAY">MB Way</option>
+                    </select>
+                    {errors.paymentMethod && <span className={styles.errorMessage}>{errors.paymentMethod}</span>}
+                </label>
 
                 <div className={styles.buttonGroup}>
                     <button className={styles.confirmButton} onClick={handleSubmit}>
