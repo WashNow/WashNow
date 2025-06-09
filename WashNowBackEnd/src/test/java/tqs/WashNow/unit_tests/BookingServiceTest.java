@@ -1,9 +1,11 @@
 package tqs.WashNow.unit_tests;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tqs.WashNow.entities.Booking;
+import tqs.WashNow.entities.BookingStatus;
 import tqs.WashNow.repositories.BookingRepository;
 import tqs.WashNow.services.BookingService;
 
@@ -59,6 +62,59 @@ public class BookingServiceTest {
         Booking created = bookingService.createBooking(booking);
         assertNull(created);
         verify(bookingRepository, times(1)).save(booking);
+    }
+
+    @Test
+    void testCreateBookingOldDate() {
+        booking.setStartTime(LocalDateTime.of(2020, 1, 1, 10, 0));
+        booking.setEndTime(LocalDateTime.of(2020, 1, 1, 11, 0));
+
+        Booking created = bookingService.createBooking(booking);
+        assertNull(created);
+        verify(bookingRepository, never()).save(booking);
+    }
+
+    @Test
+    void testCreateBookingWhenAlreadyExistsBookingThatDay() {
+        booking.setId(null);
+        booking.setUserId(42L);
+        booking.setStartTime(LocalDateTime.now().plusHours(1));
+
+        Booking existing = new Booking();
+        existing.setId(100L);
+        existing.setUserId(42L);
+        existing.setStartTime(LocalDateTime.now().minusHours(5));
+        existing.setBookingStatus(BookingStatus.RESERVED);
+
+        when(bookingRepository.findAllByUserId(42L)).thenReturn(List.of(existing));
+        Booking result = bookingService.createBooking(booking);
+
+        assertNull(result);
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+
+    @Test
+    void testLimitCreateBookings() {
+        List<Booking> existingBookings = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Booking reservedBooking = new Booking();
+            reservedBooking.setBookingStatus(BookingStatus.RESERVED);
+            existingBookings.add(reservedBooking);
+        }
+        
+        when(bookingRepository.findAllByUserId(userId)).thenReturn(existingBookings);
+
+        Booking newBooking = new Booking();
+        newBooking.setUserId(userId);
+        newBooking.setStartTime(LocalDateTime.now().plusDays(1));
+        newBooking.setEndTime(LocalDateTime.now().plusDays(1).plusHours(1));
+        
+        Booking created = bookingService.createBooking(newBooking);
+
+        assertNull(created, "Limite de reservas por utilizador atingido!");
+        
+        verify(bookingRepository, never()).save(newBooking);
     }
 
     @Test

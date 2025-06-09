@@ -163,13 +163,13 @@ class ReservationUITest {
         longitudeInput.sendKeys("-8.553754");
         createAccountButton = driver.findElement(By.name("criarBtn"));
         createAccountButton.click();
+
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
     }
 
     @Test @Order(2)
     void testCreateClient() throws InterruptedException {
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
-        
         // Criar conta do cliente
         WebElement createButton = driver.findElement(By.linkText("Criar conta"));
         createButton.click();
@@ -186,25 +186,25 @@ class ReservationUITest {
         select.selectByVisibleText("Cliente");
         WebElement createAccountButton = driver.findElement(By.name("criarBtn"));
         createAccountButton.click();
+
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
     }
 
     @Test @Order(3)
     void testLoginClient() throws InterruptedException {
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
-
         // Fazer login na conta do cliente
         WebElement emailInput = driver.findElement(By.name("email"));
         emailInput.sendKeys("c@ua.pt");
         WebElement entrarButton = driver.findElement(By.xpath("//button[text()='Entrar']"));
         entrarButton.click();
+
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
     }
 
     @Test @Order(4)
     void testReserveWash() throws InterruptedException {
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
-
         // Eseperar as reservas carregarem
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[text()='Reservar']")));
 
@@ -212,7 +212,7 @@ class ReservationUITest {
         WebElement reservarButton = driver.findElement(By.xpath("//button[text()='Reservar']"));
         reservarButton.click();
         WebElement dateInput = driver.findElement(By.name("date"));
-        dateInput.sendKeys("04-01-2025");
+        dateInput.sendKeys("04-01-2026");
         WebElement startTimeSelect = driver.findElement(By.name("startTime"));
         startTimeSelect.sendKeys("10:00");
         WebElement endTimeSelect = driver.findElement(By.name("endTime"));
@@ -223,25 +223,25 @@ class ReservationUITest {
         mbWayInput.click();
         WebElement confirmButton = driver.findElement(By.xpath("//button[text()='Confirmar Pagamento']"));
         confirmButton.click();
+
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
     }
 
     @Test @Order(5)
     void testOpenClientProfile() throws InterruptedException {
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
-
         // Aceder o perfil do cliente
         WebElement profileLink = driver.findElement(By.xpath("//span[text()='Perfil']"));
         profileLink.click();
+
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Perfil"));
     }
 
     @Test @Order(6)
     void testVerifyReservation() throws InterruptedException {
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Perfil"));
-
         // Verificar se a reserva foi criada
-        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver1 -> {
+        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(20)).until(driver1 -> {
             List<WebElement> elems =
                 driver1.findElements(By.cssSelector("li[data-testid='reserva']"));
             return elems.size() > 0 ? elems : null;
@@ -249,6 +249,6 @@ class ReservationUITest {
         String textoReserva = reservas.get(0).getText();
         String dataReserva = reservas.get(0).findElement(By.tagName("p")).getText();
         assertTrue(textoReserva.contains("e1"), "Reserva com estação não encontrada, real: " + textoReserva);
-        assertTrue(dataReserva.contains("4/1/2025"), "Reserva com data não encontrada, real: " + dataReserva);
+        assertTrue(dataReserva.contains("4/1/2026"), "Reserva com data não encontrada, real: " + dataReserva);
     }
 }

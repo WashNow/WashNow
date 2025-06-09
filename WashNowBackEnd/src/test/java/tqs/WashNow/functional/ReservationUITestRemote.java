@@ -146,7 +146,7 @@ class ReservationUITestRemote {
         WebElement reservarButton = driver.findElement(By.xpath("//button[text()='Reservar']"));
         reservarButton.click();
         WebElement dateInput = driver.findElement(By.name("date"));
-        dateInput.sendKeys("04-01-2025");
+        dateInput.sendKeys("04-01-2026");
         WebElement startTimeSelect = driver.findElement(By.name("startTime"));
         startTimeSelect.sendKeys("10:00");
         WebElement endTimeSelect = driver.findElement(By.name("endTime"));
@@ -183,6 +183,6 @@ class ReservationUITestRemote {
         String textoReserva = reservas.get(0).getText();
         String dataReserva = reservas.get(0).findElement(By.tagName("p")).getText();
         assertTrue(textoReserva.contains("e1"), "Reserva com estação não encontrada, real: " + textoReserva);
-        assertTrue(dataReserva.contains("4/1/2025"), "Reserva com data não encontrada, real: " + dataReserva);
+        assertTrue(dataReserva.contains("4/1/2026"), "Reserva com data não encontrada, real: " + dataReserva);
     }
 }
