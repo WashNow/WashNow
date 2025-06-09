@@ -11,7 +11,7 @@ const CarWashMap = () => {
   const [error, setError] = useState(null);
 
   const mapRef = useRef(null);
-  const markersRef = useRef({});
+  const popupsRef = useRef({});
   const mapInstance = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -53,7 +53,7 @@ const CarWashMap = () => {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',
+      style: `https://tiles.stadiamaps.com/styles/alidade_smooth.json?api_key=${import.meta.env.VITE_STADIA_API_KEY}`,
       center: [carWashStations[0].longitude, carWashStations[0].latitude],
       zoom: 13,
     });
@@ -61,21 +61,20 @@ const CarWashMap = () => {
     mapInstance.current = map;
 
     carWashStations.forEach(station => {
-      // Converter para o formato [longitude, latitude] que o MapLibre espera
       const coordinates = [station.longitude, station.latitude];
-      
+
       const popup = new maplibregl.Popup().setHTML(
         `<strong>${station.name}</strong><br/>
          ${station.address}<br/>
          <em>Pressão: ${station.pressureBar} bar</em>`
       );
 
-      const marker = new maplibregl.Marker({ color: '#1677ff' })
+      popupsRef.current[station.id] = popup;
+
+      new maplibregl.Marker({ color: '#1677ff' })
         .setLngLat(coordinates)
         .setPopup(popup)
         .addTo(map);
-
-      markersRef.current[station.id] = { marker, popup };
     });
 
     return () => map.remove();
@@ -84,7 +83,7 @@ const CarWashMap = () => {
   const handleSelect = (station) => {
     setSelectedId(station.id);
     const map = mapInstance.current;
-    const { marker, popup } = markersRef.current[station.id];
+    const popup = popupsRef.current[station.id];
 
     map.flyTo({
       center: [station.longitude, station.latitude],
@@ -126,6 +125,7 @@ const CarWashMap = () => {
                 <p>{station.address}</p>
                 <div className={styles.buttonGroup}>
                   <button
+
                     name="reservar"
                     className={styles.reserveButton}
                     onClick={(e) => {

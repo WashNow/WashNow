@@ -17,10 +17,41 @@ Thus, allowing drivers to easily locate available bays, reserve one or more time
 # Relevant Sources
 [JIRA Backlog Page](https://jpsopedro04.atlassian.net/jira/software/projects/MBA/boards/1?atlOrigin=eyJpIjoiZTJhNTYxNzg0MWZhNGExNDg1ZjNhZjM3ZjA0NzQ5ZDUiLCJwIjoiaiJ9)
 
-[SonarCloud Page](https://sonarcloud.io/project/overview?id=TKahk_WashNow)
+[SonarCloud Page](https://sonarcloud.io/summary/new_code?id=WashNow_WashNow)
 
-[Documentation Page - To do]()
+## Local Pages
+[Documentation Page](http://localhost:8080/swagger-ui/index.html)
+
+[Grafana Dashboards Page](http://localhost:3000)
+
+## Remote Pages in the VM
+[Documentation Page](http://deti-tqs-11.ua.pt:8080/swagger-ui/index.html)
+
+[Grafana Dashboards Page](http://deti-tqs-11.ua.pt:3000)
+
+
+## Acessing our Grafana Dashboards Page 
+    Username: admin
+    Password: SenhaTeste123!
+
+
+# How to run the code
+Todo o nosso sistema está a correr na VM graças à nossa pipeline de CI/CD que verifica a qualidade do código que quando enviado para a branch da main é depois disso automaticamente colocado dentro da nossa VM
+
+## Running locally 
+Apesar disso se o objetivo for correr o código localmente basta abrir o diretório principal do projeto e:
+1. Primeiro navegar para dentro do diretório do frontend e alterar os IPs dentro do ficheiro de nginx.conf para o IP do computador local
+2. Depois basta correr o comando de docker compose up [--build], esperar que ele descarrega todos os ficheiros e dê up dos containers e está feito, todo o sistema a correr por completo localmente.
+
 
 # Badges
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=WashNow_WashNow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=WashNow_WashNow)
+
+# Latest Changes
+Após a aula de quinta feira as mudanças principais que fizemos englobaram de forma geral:
+1. Rever os Pull Requests que já tinham sido criados mas que precisaram ainda de mais uns bug fixes e pequenas mudanças para estarem de acordo com o código na branch principal e passarem nos testes.
+2. Atualizar o README e outra documentação relativa ao projeto, nomeadamente o push do ficheiro pdf da apresentação.
+3. Adicionar mais robustez ao código do backend ao fazer verificações das reservas e melhorias e na lógica de criação das mesmas, impondo limites.
+4. Adicionar então mais testes que agora garantissem na mesma que esta nova lógica de reservas continuava a funcionar. Para isso usamos alguns de testes unitários e funcionais.
+5. Atualização da informação que é mostrada nas páginas de frontend conforme o tipo de utilizador.
