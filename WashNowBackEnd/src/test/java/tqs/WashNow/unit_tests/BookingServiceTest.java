@@ -40,8 +40,10 @@ public class BookingServiceTest {
         booking.setId(id);
         carwashBayId = 1L;
         userId = 1L;
-        startTime = LocalDateTime.of(2025, 5, 1, 8, 0);
-        endTime = LocalDateTime.of(2025, 5, 1, 9, 0);
+        startTime = LocalDateTime.of(2026, 5, 1, 8, 0);
+        endTime = LocalDateTime.of(2026, 5, 1, 9, 0);
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
     }
 
     @Test
@@ -100,6 +102,7 @@ public class BookingServiceTest {
         for (int i = 0; i < 5; i++) {
             Booking reservedBooking = new Booking();
             reservedBooking.setBookingStatus(BookingStatus.RESERVED);
+            reservedBooking.setStartTime(LocalDateTime.now().minusDays(i));
             existingBookings.add(reservedBooking);
         }
         
