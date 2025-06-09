@@ -16,7 +16,7 @@ package tqs.WashNow.controllers;
     import static org.assertj.core.api.Assertions.assertThat;
     import static org.mockito.Mockito.*;
 
-    class CarwashBayControllerIT {
+    class CarwashBayControllerTest {
 
         @Mock
         private CarwashBayService carwashBayService;

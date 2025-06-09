@@ -2,7 +2,6 @@ package tqs.WashNow.functional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,83 +13,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.springframework.boot.test.context.SpringBootTest;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.time.Duration;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ReservationUITest {
+class ReservationUITestRemote {
 
     private WebDriver driver;
-    private static Process frontendProcess;
     private WebDriverWait wait;
-
-    // Iniciar o frontend
-    @BeforeAll
-    static void startFrontend() throws IOException, InterruptedException {
-        File frontendDir = new File("../frontend");
-
-        if (!new File(frontendDir, "package.json").exists()) {
-            throw new IllegalStateException(
-                "package.json não encontrado em " + frontendDir.getAbsolutePath()
-            );
-        }
-
-        ProcessBuilder pb = new ProcessBuilder()
-            .directory(frontendDir)
-            .command("npm", "run", "dev", "--", "--port", "5180");
-        pb.redirectErrorStream(true);
-        frontendProcess = pb.start();
-
-        new Thread(() -> {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(frontendProcess.getInputStream()))) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    System.out.println("[VITE] " + line);
-                }
-            } catch (IOException e) {
-                // Ignorar
-            }
-        }).start();
-
-        int attempts = 0;
-        while (attempts < 60) {
-            try (Socket s = new Socket("localhost", 5180)) {
-                return;
-            } catch (IOException e) {
-                Thread.sleep(500);
-                attempts++;
-            }
-        }
-        throw new IllegalStateException("Erro ao iniciar o frontend.");
-    }
-
-    // Parar o frontend
-    @AfterAll
-    static void stopFrontend() {
-        if (frontendProcess != null && frontendProcess.isAlive()) {
-            frontendProcess.destroy();
-            try {
-                frontendProcess.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
-            } catch (InterruptedException ignored) {
-                // Ignorar
-            }
-            if (frontendProcess.isAlive()) {
-                frontendProcess.destroyForcibly();
-            }
-        }
-    }
 
     @BeforeAll
     void setUp() {
@@ -106,7 +40,7 @@ class ReservationUITest {
 
     @Test @Order(1)
     void testCreateOwners() throws InterruptedException {
-        driver.get("http://localhost:5180/");
+        driver.get("http://deti-tqs-11.ua.pt/");
 
         // Esperar a página carregar
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Criar conta")));
@@ -137,7 +71,7 @@ class ReservationUITest {
         createAccountButton.click();
 
         // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/"));
         
         // Criar conta de dono 2 de estacao de lavagem
         createButton = driver.findElement(By.linkText("Criar conta"));
@@ -163,13 +97,13 @@ class ReservationUITest {
         longitudeInput.sendKeys("-8.553754");
         createAccountButton = driver.findElement(By.name("criarBtn"));
         createAccountButton.click();
-
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
     }
 
     @Test @Order(2)
     void testCreateClient() throws InterruptedException {
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/"));
+        
         // Criar conta do cliente
         WebElement createButton = driver.findElement(By.linkText("Criar conta"));
         createButton.click();
@@ -186,25 +120,25 @@ class ReservationUITest {
         select.selectByVisibleText("Cliente");
         WebElement createAccountButton = driver.findElement(By.name("criarBtn"));
         createAccountButton.click();
-
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/"));
     }
 
     @Test @Order(3)
     void testLoginClient() throws InterruptedException {
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/"));
+
         // Fazer login na conta do cliente
         WebElement emailInput = driver.findElement(By.name("email"));
         emailInput.sendKeys("c@ua.pt");
         WebElement entrarButton = driver.findElement(By.xpath("//button[text()='Entrar']"));
         entrarButton.click();
-
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
     }
 
     @Test @Order(4)
     void testReserveWash() throws InterruptedException {
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/Mapa"));
+
         // Eseperar as reservas carregarem
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[text()='Reservar']")));
 
@@ -223,25 +157,25 @@ class ReservationUITest {
         mbWayInput.click();
         WebElement confirmButton = driver.findElement(By.xpath("//button[text()='Confirmar Pagamento']"));
         confirmButton.click();
-
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Mapa"));
     }
 
     @Test @Order(5)
     void testOpenClientProfile() throws InterruptedException {
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/Mapa"));
+
         // Aceder o perfil do cliente
         WebElement profileLink = driver.findElement(By.xpath("//span[text()='Perfil']"));
         profileLink.click();
-
-        // Verificar redirecionamento
-        wait.until(ExpectedConditions.urlToBe("http://localhost:5180/Perfil"));
     }
 
     @Test @Order(6)
     void testVerifyReservation() throws InterruptedException {
+        // Verificar redirecionamento
+        wait.until(ExpectedConditions.urlToBe("http://deti-tqs-11.ua.pt/Perfil"));
+
         // Verificar se a reserva foi criada
-        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(20)).until(driver1 -> {
+        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver1 -> {
             List<WebElement> elems =
                 driver1.findElements(By.cssSelector("li[data-testid='reserva']"));
             return elems.size() > 0 ? elems : null;

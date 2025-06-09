@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://deti-tqs-11.ua.pt:8080',
+        target: 'http://192.168.160.11:8080',
         changeOrigin: true,
         secure: false
       }
