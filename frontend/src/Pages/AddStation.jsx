@@ -10,18 +10,20 @@ const AddStation = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const ownerId = user?.userId;
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (!user?.isAuthenticated) {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
+
+    if (!storedUser || !storedUser.isAuthenticated) {
       alert('Precisa de iniciar sessão para aceder.');
       navigate('/');
-    } else if (!user?.isOwner) {
+    } else if (!storedUser.isOwner) {
       alert('Apenas proprietários podem adicionar estações.');
       navigate('/');
     }
-  }, [navigate, user]);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,18 +31,30 @@ const AddStation = () => {
       const res = await fetch('/api/CarwashStations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, address, latitude, longitude, ownerId }),
+        body: JSON.stringify({
+          name,
+          address,
+          latitude,
+          longitude,
+          ownerId: user.userId,
+        }),
       });
+
       if (res.ok) {
         setShowSuccess(true);
         setTimeout(() => {
           navigate('/ownerhome');
-        }, 2000); 
-      } 
+        }, 2000);
+      } else {
+        const errData = await res.json();
+        alert('Erro ao adicionar estação: ' + (errData.message || 'Erro desconhecido.'));
+      }
     } catch (err) {
       console.error('Erro ao adicionar estação:', err);
     }
   };
+
+  if (!user) return null; // Aguarda até que o user esteja carregado
 
   return (
     <div>

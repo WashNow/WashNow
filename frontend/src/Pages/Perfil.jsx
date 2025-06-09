@@ -16,64 +16,84 @@ const Perfil = () => {
         CANCELED: 'Cancelado',
     };
 
-useEffect(() => {
-    const fetchUserAndBookings = async () => {
+    useEffect(() => {
+        const fetchUserAndBookings = async () => {
+            try {
+                const localUser = JSON.parse(localStorage.getItem('user'));
+                if (!localUser?.userId) throw new Error('Utilizador não autenticado');
+
+                const userId = localUser.userId;
+
+                // Buscar pessoa pelo ID
+                const personsRes = await fetch('/api/Persons');
+                if (!personsRes.ok) throw new Error('Erro ao buscar utilizadores');
+
+                const persons = await personsRes.json();
+                const user = persons.find(p => p.id === userId);
+                if (!user) throw new Error('Utilizador não encontrado');
+
+                setUserInfo(user);
+
+                // Buscar todas as reservas
+                const bookingsRes = await fetch('/api/bookings');
+                if (!bookingsRes.ok) throw new Error('Erro ao buscar reservas');
+
+                const allBookings = await bookingsRes.json();
+                const userBookings = allBookings.filter(b => b.userId === userId);
+
+                // Buscar info das estações associadas
+                const bookingsWithStationInfo = await Promise.all(
+                    userBookings.map(async booking => {
+                        try {
+                            const stationRes = await fetch(`/api/CarwashStations/${booking.carwashBayId}`);
+                            if (!stationRes.ok) throw new Error();
+
+                            const stationData = await stationRes.json();
+                            return {
+                                ...booking,
+                                stationName: stationData.name,
+                            };
+                        } catch {
+                            return {
+                                ...booking,
+                                stationName: 'Estação desconhecida',
+                            };
+                        }
+                    })
+                );
+
+                setBookings(bookingsWithStationInfo);
+            } catch (err) {
+                console.error(err);
+                setError('Não foi possível carregar os dados do utilizador ou das reservas.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserAndBookings();
+    }, []);
+
+    const handleCancelBooking = async (bookingId) => {
+        if (!window.confirm('Tem certeza de que deseja cancelar esta reserva?')) return;
+
         try {
-            const localUser = JSON.parse(localStorage.getItem('user'));
-            if (!localUser?.userId) throw new Error('Utilizador não autenticado');
+            const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
+                method: 'PUT',
+            });
 
-            const userId = localUser.userId;
-
-            // Buscar pessoa pelo ID
-            const personsRes = await fetch('/api/Persons');
-            if (!personsRes.ok) throw new Error('Erro ao buscar utilizadores');
-
-            const persons = await personsRes.json();
-            const user = persons.find(p => p.id === userId);
-            if (!user) throw new Error('Utilizador não encontrado');
-
-            setUserInfo(user);
-
-            // Buscar todas as reservas
-            const bookingsRes = await fetch('/api/bookings');
-            if (!bookingsRes.ok) throw new Error('Erro ao buscar reservas');
-
-            const allBookings = await bookingsRes.json();
-            const userBookings = allBookings.filter(b => b.userId === userId);
-
-            // Buscar info das estações associadas
-            const bookingsWithStationInfo = await Promise.all(
-                userBookings.map(async booking => {
-                    try {
-                        const stationRes = await fetch(`/api/CarwashStations/${booking.carwashBayId}`);
-                        if (!stationRes.ok) throw new Error();
-
-                        const stationData = await stationRes.json();
-                        return {
-                            ...booking,
-                            stationName: stationData.name,
-                        };
-                    } catch {
-                        return {
-                            ...booking,
-                            stationName: 'Estação desconhecida',
-                        };
-                    }
-                })
-            );
-
-            setBookings(bookingsWithStationInfo);
+            if (res.ok) {
+                alert('Reserva cancelada com sucesso!');
+                setBookings(bookings.map(b =>
+                    b.id === bookingId ? { ...b, bookingStatus: 'CANCELED' } : b
+                ));
+            } else {
+                alert('Erro ao cancelar a reserva.');
+            }
         } catch (err) {
-            console.error(err);
-            setError('Não foi possível carregar os dados do utilizador ou das reservas.');
-        } finally {
-            setLoading(false);
+            console.error('Erro ao cancelar a reserva:', err);
         }
     };
-
-    fetchUserAndBookings();
-}, []);
-
 
     return (
         <div>
@@ -87,27 +107,7 @@ useEffect(() => {
                         <p className={styles.email}>{userInfo.email}</p>
                     </div>
                 ) : (
-
-                    <ul>
-                        {bookings.map(res => (
-                            <li key={res.id} className={styles.reserva} data-testid="reserva">
-                                <div>
-                                    <strong>{res.stationName}</strong>
-                                    <p>{new Date(res.startTime).toLocaleDateString()}</p>
-                                </div>
-                                <span
-                                    className={`${styles.status} ${res.bookingStatus === 'WASHING_COMPLETED' ? styles.completed :
-                                        res.bookingStatus === 'IN_PROGRESS' ? styles.inProgress :
-                                            res.bookingStatus === 'CANCELED' ? styles.canceled :
-                                                styles.reserved
-                                        }`}
-                                >
-                                    {statusMap[res.bookingStatus] || res.bookingStatus}
-                                </span>
-
-                            </li>
-                        ))}
-                    </ul>
+                    <p>Carregando informações do utilizador...</p>
                 )}
 
                 <div className={styles.history}>
@@ -136,6 +136,14 @@ useEffect(() => {
                                     >
                                         {statusMap[res.bookingStatus] || res.bookingStatus}
                                     </span>
+                                    {res.bookingStatus === 'RESERVED' && (
+                                        <button
+                                            className={styles.cancelButton}
+                                            onClick={() => handleCancelBooking(res.id)}
+                                        >
+                                            Cancelar
+                                        </button>
+                                    )}
                                 </li>
                             ))}
                         </ul>

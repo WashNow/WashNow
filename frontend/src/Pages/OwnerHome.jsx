@@ -7,6 +7,11 @@ const OwnerHome = ({ ownerId }) => {
   const [bays, setBays] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [selectedStationId, setSelectedStationId] = useState(null);
+  const [selectedBayId, setSelectedBayId] = useState(null);
+  const [newBayName, setNewBayName] = useState('');
+  const [newBayPrice, setNewBayPrice] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,11 +34,9 @@ const OwnerHome = ({ ownerId }) => {
   useEffect(() => {
     const fetchBays = async () => {
       try {
-        const res = await fetch('/api/bookings');
+        const res = await fetch('/api/CarwashBays');
         const data = await res.json();
-        const bayList = Array.isArray(data) ? data : [];
-        setBays(bayList);
-        console.log('Baias carregadas:', bayList);
+        setBays(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Erro ao buscar baias:', err);
       }
@@ -41,49 +44,53 @@ const OwnerHome = ({ ownerId }) => {
     fetchBays();
   }, []);
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const res = await fetch('/api/bookings');
-        const bookingsData = await res.json();
+  const handleAddBay = async (e) => {
+    e.preventDefault();
+    if (!selectedStationId || !newBayName || !newBayPrice) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
 
-        if (!selectedStationId) {
-          setReservations([]);
-          return;
-        }
+    try {
+      const res = await fetch('/api/CarwashBays', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          carwashStation: { id: selectedStationId },
+          identifiableName: newBayName,
+          pricePerMinute: parseFloat(newBayPrice),
+          active: true,
+        }),
+      });
 
-        const filtered = bookingsData.filter(booking => {
-          const bay = bays.find(b => b.id === booking.carwashBayId);
-          return bay?.stationId === selectedStationId;
-        });
-
-
-        const uniqueUserIds = [...new Set(filtered.map(b => b.userId))];
-
-        const userMap = {};
-        await Promise.all(
-          uniqueUserIds.map(async (id) => {
-            const res = await fetch(`/api/Persons/${id}`);
-            const userData = await res.json();
-            userMap[id] = userData.name;
-          })
-        );
-
-        const bookingsWithNames = filtered.map(b => ({
-          ...b,
-          userName: userMap[b.userId] || `Utilizador #${b.userId}`,
-        }));
-
-        setReservations(bookingsWithNames);
-      } catch (err) {
-        console.error('Erro ao buscar reservas:', err);
+      if (res.ok) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        setNewBayName('');
+        setNewBayPrice('');
+        setShowModal(false);
+        const updated = await fetch('/api/CarwashBays');
+        const baysData = await updated.json();
+        setBays(baysData);
+      } else {
+        const errData = await res.json();
+        alert('Erro ao adicionar baia: ' + (errData.message || 'Erro desconhecido.'));
       }
-    };
+    } catch (err) {
+      console.error('Erro ao adicionar baia:', err);
+    }
+  };
 
-    fetchReservations();
-  }, [selectedStationId]);
-
-
+  const handleShowReservations = async (bayId) => {
+    try {
+      const res = await fetch(`/api/bookings?bayId=${bayId}`);
+      const data = await res.json();
+      setReservations(Array.isArray(data) ? data : []);
+      setSelectedBayId(bayId);
+    } catch (err) {
+      console.error('Erro ao buscar reservas:', err);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -104,22 +111,80 @@ const OwnerHome = ({ ownerId }) => {
           </div>
         ))}
       </div>
+
       <div className={styles.mainContent}>
-        <h2>Reservas</h2>
-        {reservations.length === 0 ? (
-          <p>Nenhuma reserva encontrada para esta estação.</p>
+        <h2>Baias da Estação</h2>
+        <button onClick={() => setShowModal(true)} className={styles.button}>+ Nova Baia</button>
+
+        {bays.filter(b => b.carwashStation?.id === selectedStationId).length === 0 ? (
+          <p>Sem baias nesta estação.</p>
         ) : (
-          <ul className={styles.reservationList}>
-            {reservations.map((res) => (
-              <li key={res.id} className={styles.reservationCard}>
-                <p><strong>Cliente:</strong> {res.userName}</p>
-                <p><strong>Início:</strong> {new Date(res.startTime).toLocaleString()}</p>
-                <p><strong>Fim:</strong> {new Date(res.endTime).toLocaleString()}</p>
-                <p><strong>Estado:</strong> {res.bookingStatus}</p>
-              </li>
-            ))}
+          <ul className={styles.bayList}>
+            {bays
+              .filter(b => b.carwashStation?.id === selectedStationId)
+              .map(bay => (
+                <li key={bay.id} className={styles.bayCard}>
+                  <p><strong>Nome:</strong> {bay.identifiableName}</p>
+                  <p><strong>Preço/min:</strong> €{bay.pricePerMinute}</p>
+                  <p><strong>Ativa:</strong> {bay.active ? 'Sim' : 'Não'}</p>
+                  <button
+                    className={styles.button}
+                    onClick={() => handleShowReservations(bay.id)}
+                  >
+                    Mostrar Reservas
+                  </button>
+                </li>
+              ))}
           </ul>
         )}
+
+        {reservations.length > 0 && selectedBayId && (
+          <div className={styles.reservations}>
+            <h3>Reservas da Baia</h3>
+            <ul>
+              {reservations.map(reservation => (
+                <li key={reservation.id}>
+                  <p><strong>ID:</strong> {reservation.id}</p>
+                  <p><strong>Usuário:</strong> {reservation.userId}</p>
+                  <p><strong>Início:</strong> {new Date(reservation.startTime).toLocaleString()}</p>
+                  <p><strong>Término:</strong> {new Date(reservation.endTime).toLocaleString()}</p>
+                  <p><strong>Status:</strong> {reservation.bookingStatus}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {showModal && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <button className={styles.closeButton} onClick={() => setShowModal(false)}>×</button>
+              <h3>Adicionar Baia</h3>
+              <form onSubmit={handleAddBay} className={styles.form}>
+                <label className={styles.label}>Nome da Baia</label>
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={newBayName}
+                  onChange={(e) => setNewBayName(e.target.value)}
+                  required
+                />
+                <label className={styles.label}>Preço por Minuto (€)</label>
+                <input
+                  className={styles.input}
+                  type="number"
+                  step="0.01"
+                  value={newBayPrice}
+                  onChange={(e) => setNewBayPrice(e.target.value)}
+                  required
+                />
+                <button type="submit" className={styles.button}>Adicionar</button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {showSuccess && <p className={styles.successMessage}>Baia adicionada com sucesso!</p>}
       </div>
     </div>
   );

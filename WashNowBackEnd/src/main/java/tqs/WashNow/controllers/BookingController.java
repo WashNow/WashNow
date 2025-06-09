@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import tqs.WashNow.services.BookingService;
 import tqs.WashNow.entities.Booking;
+import tqs.WashNow.entities.BookingStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +66,7 @@ public class BookingController {
     })
     public ResponseEntity<Booking> createBooking(@RequestBody Booking booking) {
         Booking createdBooking = bookingService.createBooking(booking);
+        bookingService.updateBookingStatuses();
         return new ResponseEntity<>(createdBooking, HttpStatus.CREATED);
     }
 
@@ -87,6 +90,7 @@ public class BookingController {
     public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
         Booking booking = bookingService.getBookingById(id);
         if (booking != null) {
+            bookingService.updateBookingStatuses();
             return new ResponseEntity<>(booking, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -101,6 +105,7 @@ public class BookingController {
     })
     public ResponseEntity<Booking> updateBooking(@PathVariable Long id, @RequestBody Booking booking) {
         Booking updatedBooking = bookingService.updateBookingById(id, booking);
+        bookingService.updateBookingStatuses();
         if (updatedBooking != null) {
             return new ResponseEntity<>(updatedBooking, HttpStatus.OK);
         } else {
@@ -122,7 +127,22 @@ public class BookingController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
 
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelBooking(@PathVariable Long id) {
+        Booking booking = bookingService.getBookingById(id);
+    
+        if (booking != null) {
+            if (booking.getBookingStatus() == BookingStatus.RESERVED) {
+                booking.setBookingStatus(BookingStatus.CANCELED);
+                bookingService.updateBookingById(id, booking);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     
 }

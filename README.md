@@ -55,3 +55,4 @@ Após a aula de quinta feira as mudanças principais que fizemos englobaram de f
 3. Adicionar mais robustez ao código do backend ao fazer verificações das reservas e melhorias e na lógica de criação das mesmas, impondo limites.
 4. Adicionar então mais testes que agora garantissem na mesma que esta nova lógica de reservas continuava a funcionar. Para isso usamos alguns de testes unitários e funcionais.
 5. Atualização da informação que é mostrada nas páginas de frontend conforme o tipo de utilizador.
+6. Melhorias na interface do frontend, para permitir todo o ciclo de vida de uma reserva.

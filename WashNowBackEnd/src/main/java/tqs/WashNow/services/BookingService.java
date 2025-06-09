@@ -64,6 +64,24 @@ public class BookingService {
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
+
+    // Update booking statuses based on current time
+    public void updateBookingStatuses() {
+        List<Booking> bookings = bookingRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+    
+        for (Booking booking : bookings) {
+            if (booking.getBookingStatus() == BookingStatus.RESERVED &&
+                now.isAfter(booking.getStartTime()) && now.isBefore(booking.getEndTime())) {
+                booking.setBookingStatus(BookingStatus.IN_PROGRESS);
+                bookingRepository.save(booking);
+            } else if (booking.getBookingStatus() == BookingStatus.IN_PROGRESS &&
+                       now.isAfter(booking.getEndTime())) {
+                booking.setBookingStatus(BookingStatus.WASHING_COMPLETED);
+                bookingRepository.save(booking);
+            }
+        }
+    }
     
     
 }

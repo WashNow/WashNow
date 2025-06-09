@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ReservaPage.module.css';
-import { Modal, Radio, Button } from 'antd';
+import { Modal } from 'antd';
 
 const ReservaPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
+    const [stations, setStations] = useState([]);
+    const [bays, setBays] = useState([]);
+    const [selectedStationId, setSelectedStationId] = useState('');
+    const [selectedBayId, setSelectedBayId] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
@@ -18,25 +22,6 @@ const ReservaPage = () => {
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-    const { stationId, stationData } = location.state || {};
-
-    const [stationInfo, setStationInfo] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const generateTimeSlots = (startHour, endHour, intervalMinutes) => {
-        const slots = [];
-        const start = startHour * 60;
-        const end = endHour * 60;
-
-        for (let minutes = start; minutes <= end; minutes += intervalMinutes) {
-            const hours = String(Math.floor(minutes / 60)).padStart(2, '0');
-            const mins = String(minutes % 60).padStart(2, '0');
-            slots.push(`${hours}:${mins}`);
-        }
-        return slots;
-    };
-
     useEffect(() => {
         if (!user?.isAuthenticated) {
             navigate('/');
@@ -46,35 +31,72 @@ const ReservaPage = () => {
         }
     }, []);
 
-    const timeSlots = generateTimeSlots(8, 19, 20);
+    useEffect(() => {
+        const fetchStations = async () => {
+            try {
+                const res = await fetch('/api/CarwashStations');
+                const data = await res.json();
+                setStations(data);
+            } catch (err) {
+                console.error('Erro ao buscar estações:', err);
+            }
+        };
+        fetchStations();
+    }, []);
+
+    useEffect(() => {
+        const fetchBays = async () => {
+            if (!selectedStationId) return;
+            try {
+                const res = await fetch(`/api/CarwashBays?stationId=${selectedStationId}`);
+                const data = await res.json();
+                setBays(data);
+            } catch (err) {
+                console.error('Erro ao buscar baias:', err);
+            }
+        };
+        fetchBays();
+    }, [selectedStationId]);
 
     const criarReserva = async () => {
-        const startISO = new Date(`${selectedDate}T${startTime}:00`).toISOString();
-        const endISO = new Date(`${selectedDate}T${endTime}:00`).toISOString();
-
-        const response = await fetch('/api/bookings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                carwashBayId: stationInfo.id,
-                userId: user?.userId,
-                startTime: startISO,
-                endTime: endISO,
-                bookingStatus: "RESERVED"
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Erro ao criar a reserva');
+        if (!selectedDate || !startTime || !endTime) {
+            console.error('Data ou horário inválido:', { selectedDate, startTime, endTime });
+            alert('Por favor, preencha todos os campos de data e horário.');
+            return;
+        }
+    
+        try {
+            const startISO = new Date(`${selectedDate}T${startTime}:00`).toISOString();
+            const endISO = new Date(`${selectedDate}T${endTime}:00`).toISOString();
+    
+            const response = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    carwashBayId: selectedBayId,
+                    userId: user?.userId,
+                    startTime: startISO,
+                    endTime: endISO,
+                    bookingStatus: "RESERVED"
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Erro ao criar a reserva');
+            }
+        } catch (error) {
+            console.error('Erro ao criar reserva:', error);
+            alert('Ocorreu um erro ao criar a reserva. Tente novamente.');
         }
     };
-
 
     const validateForm = () => {
         const newErrors = {};
 
+        if (!selectedStationId) newErrors.station = 'Por favor, selecione uma estação';
+        if (!selectedBayId) newErrors.bay = 'Por favor, selecione uma baia';
         if (!selectedDate) newErrors.date = 'Por favor, selecione uma data';
         if (!startTime) newErrors.startTime = 'Por favor, selecione a hora de início';
         if (!endTime) newErrors.endTime = 'Por favor, selecione a hora de término';
@@ -91,34 +113,6 @@ const ReservaPage = () => {
             setShowPayment(true);
         }
     };
-
-    useEffect(() => {
-        const fetchStationData = async () => {
-            try {
-                if (stationData) {
-                    setStationInfo(stationData);
-                    setIsLoading(false);
-                } else if (stationId) {
-                    const response = await fetch(`/api/CarwashStations/${stationId}`);
-                    if (!response.ok) {
-                        throw new Error('Estação não encontrada');
-                    }
-
-                    const data = await response.json();
-                    setStationInfo(data);
-                } else {
-                    throw new Error('Nenhuma estação especificada');
-                }
-            } catch (err) {
-                console.error('Erro ao buscar dados da estação:', err);
-                setError(err.message);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchStationData();
-    }, [stationId, stationData]);
 
     const handlePayment = async () => {
         if (!paymentMethod) {
@@ -145,7 +139,7 @@ const ReservaPage = () => {
         if (!validateForm()) return;
 
         try {
-            await criarReserva(); // reutiliza a função
+            await criarReserva();
 
             setShowSuccessPopup(true);
             setTimeout(() => navigate('/Perfil'), 1500);
@@ -155,34 +149,57 @@ const ReservaPage = () => {
         }
     };
 
-
-    if (isLoading) return <div className={styles.container}>Carregando informações da estação...</div>;
-    if (error) {
-        return (
-            <div className={styles.container}>
-                <p>Erro: {error}</p>
-                <button onClick={() => navigate(-1)}>Voltar</button>
-            </div>
-        );
+    const timeSlots = [];
+    for (let h = 8; h < 20; h++) {
+    timeSlots.push(`${String(h).padStart(2, '0')}:00`);
+    timeSlots.push(`${String(h).padStart(2, '0')}:30`);
     }
-    if (!stationInfo) return <div className={styles.container}>Estação não encontrada.</div>;
 
     return (
         <div className={styles.container}>
-            <h1>Reserva em {stationInfo.name}</h1>
-            <p><strong>Endereço:</strong> {stationInfo.address}</p>
+            <h1>Reserva</h1>
 
             <div className={styles.formSection}>
+                <label>
+                    Estação:
+                    <select
+                        value={selectedStationId}
+                        onChange={(e) => setSelectedStationId(e.target.value)}
+                        className={`${styles.input} ${errors.station ? styles.error : ''}`}
+                    >
+                        <option value="">Selecionar...</option>
+                        {stations.map(station => (
+                            <option key={station.id} value={station.id}>
+                                {station.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.station && <span className={styles.errorMessage}>{errors.station}</span>}
+                </label>
+
+                <label>
+                    Baia:
+                    <select
+                        value={selectedBayId}
+                        onChange={(e) => setSelectedBayId(e.target.value)}
+                        className={`${styles.input} ${errors.bay ? styles.error : ''}`}
+                    >
+                        <option value="">Selecionar...</option>
+                        {bays.map(bay => (
+                            <option key={bay.id} value={bay.id}>
+                                {bay.identifiableName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.bay && <span className={styles.errorMessage}>{errors.bay}</span>}
+                </label>
+
                 <label>
                     Data:
                     <input
                         type="date"
-                        name="date"
                         value={selectedDate}
-                        onChange={(e) => {
-                            setSelectedDate(e.target.value);
-                            setShowPayment(false);
-                        }}
+                        onChange={(e) => setSelectedDate(e.target.value)}
                         className={`${styles.input} ${errors.date ? styles.error : ''}`}
                         min={new Date().toISOString().split('T')[0]}
                     />
@@ -193,11 +210,7 @@ const ReservaPage = () => {
                     Hora de Início:
                     <select
                         value={startTime}
-                        name="startTime"
-                        onChange={(e) => {
-                            setStartTime(e.target.value);
-                            setShowPayment(false);
-                        }}
+                        onChange={(e) => setStartTime(e.target.value)}
                         className={`${styles.input} ${errors.startTime ? styles.error : ''}`}
                     >
                         <option value="">Selecionar...</option>
@@ -208,15 +221,12 @@ const ReservaPage = () => {
                     {errors.startTime && <span className={styles.errorMessage}>{errors.startTime}</span>}
                 </label>
 
+
                 <label>
                     Hora de Término:
                     <select
                         value={endTime}
-                        name="endTime"
-                        onChange={(e) => {
-                            setEndTime(e.target.value);
-                            setShowPayment(false);
-                        }}
+                        onChange={(e) => setEndTime(e.target.value)}
                         className={`${styles.input} ${errors.endTime || errors.timeRange ? styles.error : ''}`}
                     >
                         <option value="">Selecionar...</option>
@@ -229,6 +239,7 @@ const ReservaPage = () => {
                     {errors.endTime && <span className={styles.errorMessage}>{errors.endTime}</span>}
                     {errors.timeRange && <span className={styles.errorMessage}>{errors.timeRange}</span>}
                 </label>
+
 
                 <div className={styles.buttonGroup}>
                     <button className={styles.confirmButton} onClick={handleSubmit}>
@@ -248,41 +259,11 @@ const ReservaPage = () => {
                 centered
             >
                 <h3>Resumo da Reserva</h3>
-                <p><strong>Local:</strong> {stationInfo.name}</p>
+                <p><strong>Estação:</strong> {stations.find(s => s.id === selectedStationId)?.name}</p>
+                <p><strong>Baia:</strong> {bays.find(b => b.id === selectedBayId)?.identifiableName}</p>
                 <p><strong>Data:</strong> {selectedDate}</p>
                 <p><strong>Horário:</strong> {startTime} - {endTime}</p>
                     
-                <div className={styles.paymentMethods}>
-                    <h4>Método de Pagamento</h4>
-                    <label className={styles.paymentOption}>
-                        <input
-                            type="radio"
-                            name="payment"
-                            value="Cartão de Crédito"
-                            onChange={() => setPaymentMethod('Cartão de Crédito')}
-                        />
-                        Cartão de Crédito
-                    </label>
-                    <label className={styles.paymentOption} id="mbway">
-                        <input
-                            type="radio"
-                            name="payment"
-                            value="MB Way"
-                            onChange={() => setPaymentMethod('MB Way')}
-                        />
-                        MB Way
-                    </label>
-                    <label className={styles.paymentOption}>
-                        <input
-                            type="radio"
-                            name="payment"
-                            value="Dinheiro"
-                            onChange={() => setPaymentMethod('Dinheiro')}
-                        />
-                        Dinheiro
-                    </label>
-                </div>
-
                 <button 
                     className={styles.payButton}
                     onClick={handlePayment}
