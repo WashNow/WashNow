@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import tqs.WashNow.entities.Booking;
 import tqs.WashNow.services.BookingService;
+import tqs.WashNow.entities.BookingStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -93,4 +94,51 @@ class BookingControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         verify(bookingService, times(1)).deleteBookingById(id);
     }
+
+    @Test
+    void testCancelBooking_Success() {
+        Long id = 1L;
+        Booking booking = new Booking();
+        booking.setId(id);
+        booking.setBookingStatus(BookingStatus.RESERVED);
+    
+        when(bookingService.getBookingById(id)).thenReturn(booking);
+        when(bookingService.updateBookingById(id, booking)).thenReturn(booking);
+    
+        ResponseEntity<Void> response = bookingController.cancelBooking(id);
+    
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(bookingService, times(1)).getBookingById(id);
+        verify(bookingService, times(1)).updateBookingById(id, booking);
+    }
+    
+    @Test
+    void testCancelBooking_BadRequest() {
+        Long id = 1L;
+        Booking booking = new Booking();
+        booking.setId(id);
+        booking.setBookingStatus(BookingStatus.IN_PROGRESS); // Status diferente de RESERVED
+    
+        when(bookingService.getBookingById(id)).thenReturn(booking);
+    
+        ResponseEntity<Void> response = bookingController.cancelBooking(id);
+    
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verify(bookingService, times(1)).getBookingById(id);
+        verify(bookingService, never()).updateBookingById(anyLong(), any(Booking.class));
+    }
+    
+    @Test
+    void testCancelBooking_NotFound() {
+        Long id = 1L;
+    
+        when(bookingService.getBookingById(id)).thenReturn(null); // Reserva inexistente
+    
+        ResponseEntity<Void> response = bookingController.cancelBooking(id);
+    
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        verify(bookingService, times(1)).getBookingById(id);
+        verify(bookingService, never()).updateBookingById(anyLong(), any(Booking.class));
+    }
+
 }

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './ReservaPage.module.css';
 import { Modal } from 'antd';
 
 const ReservaPage = () => {
-    const location = useLocation();
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -17,7 +16,6 @@ const ReservaPage = () => {
     const [endTime, setEndTime] = useState('');
     const [errors, setErrors] = useState({});
     const [showPayment, setShowPayment] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -29,7 +27,7 @@ const ReservaPage = () => {
             alert('Apenas utilizadores do tipo condutor podem fazer reservas.');
             navigate('/');
         }
-    }, []);
+    }, [navigate, user?.isAuthenticated, user?.isOwner]);
 
     useEffect(() => {
         const fetchStations = async () => {

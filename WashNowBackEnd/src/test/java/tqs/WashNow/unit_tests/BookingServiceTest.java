@@ -177,4 +177,44 @@ public class BookingServiceTest {
         assertTrue(result.contains(booking));
         verify(bookingRepository, times(1)).findAll();
     }
+
+    @Test
+    void testUpdateBookingStatuses() {
+        // Cenário 1: Reserva com status RESERVED e dentro do intervalo de tempo
+        Booking reservedBooking = new Booking();
+        reservedBooking.setId(1L);
+        reservedBooking.setBookingStatus(BookingStatus.RESERVED);
+        reservedBooking.setStartTime(LocalDateTime.now().minusMinutes(10));
+        reservedBooking.setEndTime(LocalDateTime.now().plusMinutes(10));
+    
+        // Cenário 2: Reserva com status IN_PROGRESS e fora do intervalo de tempo
+        Booking inProgressBooking = new Booking();
+        inProgressBooking.setId(2L);
+        inProgressBooking.setBookingStatus(BookingStatus.IN_PROGRESS);
+        inProgressBooking.setStartTime(LocalDateTime.now().minusHours(1));
+        inProgressBooking.setEndTime(LocalDateTime.now().minusMinutes(10));
+    
+        // Cenário 3: Reserva com status WASHING_COMPLETED (não deve ser alterada)
+        Booking completedBooking = new Booking();
+        completedBooking.setId(3L);
+        completedBooking.setBookingStatus(BookingStatus.WASHING_COMPLETED);
+        completedBooking.setStartTime(LocalDateTime.now().minusHours(2));
+        completedBooking.setEndTime(LocalDateTime.now().minusHours(1));
+    
+        List<Booking> bookings = Arrays.asList(reservedBooking, inProgressBooking, completedBooking);
+    
+        when(bookingRepository.findAll()).thenReturn(bookings);
+    
+        bookingService.updateBookingStatuses();
+    
+        // Verificar se o status foi atualizado corretamente
+        assertEquals(BookingStatus.IN_PROGRESS, reservedBooking.getBookingStatus());
+        assertEquals(BookingStatus.WASHING_COMPLETED, inProgressBooking.getBookingStatus());
+        assertEquals(BookingStatus.WASHING_COMPLETED, completedBooking.getBookingStatus());
+    
+        // Verificar se o método save foi chamado apenas para os bookings que mudaram de status
+        verify(bookingRepository, times(1)).save(reservedBooking);
+        verify(bookingRepository, times(1)).save(inProgressBooking);
+        verify(bookingRepository, never()).save(completedBooking);
+    }
 }
