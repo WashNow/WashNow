@@ -14,7 +14,7 @@ export const options = {
 // Measure custom metric: number of wash sessions created
 let washSessionTrend = new Trend('wash_session_created');
 
-const BASE = 'http://localhost:8080';
+const BASE = 'http://deti-tqs-11.ua.pt:8080';
 
 export default function () {
   // 1. Health check

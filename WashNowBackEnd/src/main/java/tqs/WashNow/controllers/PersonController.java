@@ -20,6 +20,23 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * REST controller for managing Person entities.
+ * Provides endpoints for creating, retrieving, updating, and deleting Persons.
+ * 
+ * Endpoints:
+ * - POST /api/Persons: Create a new Person.
+ * - GET /api/Persons: Retrieve all Persons.
+ * - GET /api/Persons/{id}: Retrieve a Person by ID.
+ * - PUT /api/Persons/{id}: Update a Person by ID.
+ * - DELETE /api/Persons/{id}: Delete a Person by ID.
+ * 
+ * Dependencies:
+ * - PersonService: Service layer for handling business logic related to Persons.
+ * 
+ * @see PersonService
+ * @see Person
+ */
 @RestController
 @RequestMapping("/api/Persons")
 @Tag(name = "Person", description = "Person API")
