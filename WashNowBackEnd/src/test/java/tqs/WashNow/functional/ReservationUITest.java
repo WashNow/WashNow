@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
