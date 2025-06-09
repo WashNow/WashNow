@@ -26,7 +26,6 @@ import java.time.Duration;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -241,9 +240,10 @@ class ReservationUITest {
     @Test @Order(6)
     void testVerifyReservation() throws InterruptedException {
         // Verificar se a reserva foi criada
-        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(20)).until(driver1 -> {
-            List<WebElement> elems =
-                driver1.findElements(By.cssSelector("li[data-testid='reserva']"));
+        List<WebElement> reservas = new WebDriverWait(driver, Duration.ofSeconds(20)).until(d -> {
+            List<WebElement> elems = d.findElements(
+                By.xpath("//div[contains(@class,'history')]//ul/li")
+            );
             return elems.size() > 0 ? elems : null;
         });
         String textoReserva = reservas.get(0).getText();
