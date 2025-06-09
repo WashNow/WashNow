@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ReservationUITestRemote {
+class ReservationUITestRemote {
 
     private WebDriver driver;
     private WebDriverWait wait;

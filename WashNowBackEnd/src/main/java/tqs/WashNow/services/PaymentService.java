@@ -8,6 +8,14 @@ import tqs.WashNow.entities.Payment;
 import java.util.List;
 
 
+/**
+ * Service class responsible for handling payment-related operations in the WashNow application.
+ * This service provides methods to create, read, update, and delete payment records,
+ * acting as an intermediary layer between the controller and the repository.
+ *
+ * The service ensures that no duplicate payments are created based on ID and
+ * handles the appropriate validation before performing database operations.
+ */
 @Service
 public class PaymentService {
 

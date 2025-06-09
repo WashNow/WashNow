@@ -20,6 +20,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
+/**
+ * Controller for managing WashSession entities.
+ * Provides endpoints for creating, retrieving, updating, and deleting WashSessions.
+ * 
+ * Endpoints:
+ * - POST /api/WashSessions: Create a new WashSession.
+ * - GET /api/WashSessions: Retrieve all WashSessions.
+ * - GET /api/WashSessions/{id}: Retrieve a specific WashSession by its ID.
+ * - PUT /api/WashSessions/{id}: Update a specific WashSession by its ID.
+ * - DELETE /api/WashSessions/{id}: Delete a specific WashSession by its ID.
+ * 
+ * Dependencies:
+ * - WashSessionService: Service layer for handling WashSession business logic.
+ * 
+ * Response Codes:
+ * - 201: WashSession created successfully.
+ * - 200: Request processed successfully (for example retrieving or updating WashSessions).
+ * - 204: WashSession deleted successfully.
+ * - 400: Invalid request data.
+ * - 404: WashSession not found.
+ * - 500: Internal server error.
+ * 
+ * @see WashSessionService
+ * @see WashSession
+ */
 @RestController
 @RequestMapping("/api/WashSessions")
 @Tag(name = "WashSession", description = "WashSession API")
